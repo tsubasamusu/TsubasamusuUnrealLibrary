@@ -11,5 +11,5 @@ class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuMathLibrary : public UBlueprintFu
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Math", meta = (Keywords = "cut decimal"))
-	static float CutDecimal(const float Value, const int DecimalPlace = 1);
+	static double CutDecimal(const double Value, const int DecimalPlace = 1);
 };
