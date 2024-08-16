@@ -1,11 +1,11 @@
 #include "Math/TsubasamusuFloatLibrary.h"
-#include "Debug/LogUtility.h"
+#include "Debug/TsubasamusuLogLibrary.h"
 
 double UTsubasamusuFloatLibrary::CutDecimal(const double Value, const int DecimalPlace)
 {
 	if (DecimalPlace < 1)
 	{
-		ULogUtility::LogError(TEXT("The \"DecimalPlace\" in \"UMathLibrary::CutDecimal()\" must be greater than or equal to 1."));
+		UTsubasamusuLogLibrary::LogError(TEXT("The \"DecimalPlace\" in \"UMathLibrary::CutDecimal()\" must be greater than or equal to 1."));
 
 		return 0.0;
 	}
