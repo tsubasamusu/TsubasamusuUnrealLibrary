@@ -2,10 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "LogUtility.generated.h"
+#include "TsubasamusuLogLibrary.generated.h"
 
 UCLASS()
-class TSUBASAMUSUUNREALLIBRARY_API ULogUtility : public UBlueprintFunctionLibrary
+class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuLogLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

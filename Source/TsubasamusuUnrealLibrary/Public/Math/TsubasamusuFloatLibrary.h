@@ -2,10 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "UTsubasamusuMathLibrary.generated.h"
+#include "TsubasamusuFloatLibrary.generated.h"
 
 UCLASS()
-class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuMathLibrary : public UBlueprintFunctionLibrary
+class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuFloatLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
