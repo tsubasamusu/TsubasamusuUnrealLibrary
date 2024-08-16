@@ -1,7 +1,10 @@
 # 機能
 ## Debug
 ### ログや警告、エラーをアウトプットログへ表示する
-![image](https://github.com/user-attachments/assets/6be52d5c-db2f-45bb-96b6-bfeff8ab9a0a)
+- bShowInViewport：ログをビューポートにも表示するかどうか
+- DisplayTime：ログをビューポートにも表示する際に何秒間表示するか
+
+![image](https://github.com/user-attachments/assets/733ef8ee-f549-4765-add9-27e81cb8fb1d)
 ## Math
 ### 小数点を任意の位で切り捨てる
 この例では ``1.2345`` を小数第二位まで保持し、小数第三位以下の値を切り捨てるため ``1.23`` という値が返って来る。
