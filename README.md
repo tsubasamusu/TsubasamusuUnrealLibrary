@@ -1,4 +1,19 @@
 # 機能
+## Convert
+### TextureRenderTarget2D を Texture2D に変換する
+※変換対象の TextureRenderTarget2D のフォーマットは ``RTF RGBA8``（``EPixelFormat::PF_B8G8R8A8``）である必要がある
+
+![image](https://github.com/user-attachments/assets/820d1511-396a-42be-abfb-1ee70b14461e)
+### Texture2D とバイト配列（``TArray<uint8>``）の相互変換を行う
+※変換対象の Texture2D のフォーマットは ``RTF RGBA8``（``EPixelFormat::PF_B8G8R8A8``）である必要がある
+
+※ ``ConvertByteArrayToTexture()`` で変換後の Texture2D のサイズを指定する引数は変換前の Texture2D のそれと一致させる必要がある
+
+![image](https://github.com/user-attachments/assets/505b49a2-0b50-4e57-8a28-f96ae1bbdccf)
+### Texture2D を PNG データ（``TArray<uint8>``）に変換する
+※変換対象の Texture2D のフォーマットは ``RTF RGBA8``（``EPixelFormat::PF_B8G8R8A8``）である必要がある
+
+![image](https://github.com/user-attachments/assets/36134ea8-cdef-437e-965c-dec63469340a)
 ## Debug
 ### ログや警告、エラーをアウトプットログへ表示する
 - ``bShowInViewport``：ログをビューポートにも表示するかどうか
