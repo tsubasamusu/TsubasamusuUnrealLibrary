@@ -10,6 +10,6 @@ class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuFloatLibrary : public UBlueprintF
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Math", meta = (Keywords = "cut decimal"))
-	static double CutDecimal(const double Value, const int DecimalPlace = 1);
+	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Math", meta = (Keywords = "cut decimal"))
+	static double CutDecimal(const double Value, const int32 DecimalPlace = 1);
 };
