@@ -32,6 +32,14 @@
 ※小数の桁数が増えたりすると正確な値を取得できない可能性がある
 
 ![image](https://github.com/user-attachments/assets/e7f8583d-e28d-48d9-948b-c205c5f15d7c)
+## Slack
+### Slack の任意のチェンネルに任意のファイルを送信する
+- ``FileData``：対象のファイルを ``TArray<uint8>`` に変換した値
+- ``FileSize``：対象のファイルの ``TArray<uint8>`` の要素数
+
+※ [Slack API](https://api.slack.com/) にてボットの権限に ``files:write`` を追加する必要がある
+
+![image](https://github.com/user-attachments/assets/a53565f5-13cd-45da-b1da-3f2685cca32f)
 # 使用方法
 1. 「**Releases**」から最新版（**Latest**）の「**Source code**」をダウンロードする
 2. ダウンロードした ZIP ファイルを展開して UE プロジェクトのルートディレクトリにある **Plugins** フォルダ内に移動させる（ **Plugins** フォルダが無い場合は自分で作成する）
