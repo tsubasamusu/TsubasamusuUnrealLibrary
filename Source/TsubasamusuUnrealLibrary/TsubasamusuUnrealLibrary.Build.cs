@@ -18,7 +18,9 @@ public class TsubasamusuUnrealLibrary : ModuleRules
             "Engine",
             "Slate",
             "SlateCore",
-            "HTTP"
+            "HTTP",
+            "Json",
+            "JsonUtilities"
         });
     }
 }
