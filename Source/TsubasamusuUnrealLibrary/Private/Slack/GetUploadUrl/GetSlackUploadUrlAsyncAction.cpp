@@ -96,7 +96,7 @@ void UGetSlackUploadUrlAsyncAction::OnCompleted(const FSlackUploadUrlResponse& R
 
 void UGetSlackUploadUrlAsyncAction::OnFailed(const FString& TriedThing, const FSlackUploadUrlResponse& Response)
 {
-    UTsubasamusuLogLibrary::LogError(TEXT("Failed to ") + TriedThing + TEXT(" to get a URL for upload a file to slack."));
+    UTsubasamusuLogLibrary::LogError(TEXT("Failed to ") + TriedThing + TEXT(" to get a URL for upload a file to Slack."));
 
     OnCompleted(Response);
 }
