@@ -40,5 +40,9 @@ UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldConte
 
 	SceneCaptureComponent2D->CaptureScene();
 
-	return UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTexture2D(TextureRenderTarget2D);
+	UTexture2D* Texture2D = UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTexture2D(SceneCaptureComponent2D->TextureTarget);
+
+	SceneCaptureActor->Destroy();
+
+	return Texture2D;
 }
