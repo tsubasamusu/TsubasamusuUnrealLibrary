@@ -2,10 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "TextureConvertLibrary.generated.h"
+#include "TsubasamusuTextureConvertLibrary.generated.h"
 
 UCLASS()
-class TSUBASAMUSUUNREALLIBRARY_API UTextureConvertLibrary : public UBlueprintFunctionLibrary
+class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuTextureConvertLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
