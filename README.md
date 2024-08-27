@@ -20,6 +20,10 @@
 - ``DisplayTime``：ログをビューポートにも表示する際に何秒間表示するか
 
 ![image](https://github.com/user-attachments/assets/733ef8ee-f549-4765-add9-27e81cb8fb1d)
+## Graphic
+### 任意の CameraComponent の視点の Texture2D を作成する
+
+![image](https://github.com/user-attachments/assets/6c707003-cba2-4778-a0b4-66bc31a7d5e3)
 ## HTTP
 ### URL にクエリパラメータを追加する
 この例では ``"https://hoge?Key0=Value0&Key1=Value1"`` という文字列が返って来る。
