@@ -6,7 +6,7 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Debug/TsubasamusuLogLibrary.h"
 
-UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldContextObject, UCameraComponent* CameraComponent, int32 TextureWidth, int32 TextureHeight, bool bUseCameraFieldOfView, FPostProcessSettings PostProcessSettings)
+UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldContextObject, UCameraComponent* CameraComponent, int32 TextureWidth, int32 TextureHeight, FPostProcessSettings PostProcessSettings)
 {
     if (!IsValid(WorldContextObject))
     {
@@ -50,7 +50,7 @@ UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldConte
     SceneCaptureComponent2D->bCaptureOnMovement = false;
     SceneCaptureComponent2D->bAlwaysPersistRenderingState = true;
     SceneCaptureComponent2D->TextureTarget = TextureRenderTarget2D;
-    if (bUseCameraFieldOfView) SceneCaptureComponent2D->FOVAngle = CameraComponent->FieldOfView;
+    SceneCaptureComponent2D->FOVAngle = CameraComponent->FieldOfView;
 
     SceneCaptureComponent2D->PostProcessSettings = PostProcessSettings;
 
