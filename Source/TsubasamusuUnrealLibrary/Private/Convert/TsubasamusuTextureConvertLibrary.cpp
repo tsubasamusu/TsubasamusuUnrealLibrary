@@ -1,9 +1,9 @@
-#include "Convert/TextureConvertLibrary.h"
+#include "Convert/TsubasamusuTextureConvertLibrary.h"
 #include "Debug/TsubasamusuLogLibrary.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "IImageWrapperModule.h"
 
-UTexture2D* UTextureConvertLibrary::ConvertTextureRenderTargetToTexture2D(UTextureRenderTarget2D* TextureRenderTarget2D)
+UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTexture2D(UTextureRenderTarget2D* TextureRenderTarget2D)
 {
     if (!IsValid(TextureRenderTarget2D))
     {
@@ -34,7 +34,7 @@ UTexture2D* UTextureConvertLibrary::ConvertTextureRenderTargetToTexture2D(UTextu
 
     TextureRenderTargetResource->ReadPixels(ImageColors);
 
-    int32 ExpectedDataSize = Texture2D->PlatformData->Mips[0].BulkData.GetBulkDataSize();
+    int32 ExpectedDataSize = Texture2D->GetPlatformData()->Mips[0].BulkData.GetBulkDataSize();
 
     if (ImageColors.Num() * sizeof(FColor) != ExpectedDataSize)
     {
@@ -43,18 +43,18 @@ UTexture2D* UTextureConvertLibrary::ConvertTextureRenderTargetToTexture2D(UTextu
         return nullptr;
     }
 
-    void* TextureData = Texture2D->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+    void* TextureData = Texture2D->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
 
     FMemory::Memcpy(TextureData, ImageColors.GetData(), ImageColors.Num() * sizeof(FColor));
 
-    Texture2D->PlatformData->Mips[0].BulkData.Unlock();
+    Texture2D->GetPlatformData()->Mips[0].BulkData.Unlock();
 
     Texture2D->UpdateResource();
 
     return Texture2D;
 }
 
-TArray<uint8> UTextureConvertLibrary::ConvertTextureToByteArray(UTexture2D* Texture2D)
+TArray<uint8> UTsubasamusuTextureConvertLibrary::ConvertTextureToByteArray(UTexture2D* Texture2D)
 {
     TArray<uint8> TextureData;
 
@@ -72,14 +72,14 @@ TArray<uint8> UTextureConvertLibrary::ConvertTextureToByteArray(UTexture2D* Text
         return TextureData;
     }
 
-    if (!Texture2D->PlatformData || Texture2D->PlatformData->Mips.Num() == 0)
+    if (!Texture2D->GetPlatformData() || Texture2D->GetPlatformData()->Mips.Num() == 0)
     {
         UTsubasamusuLogLibrary::LogError(TEXT("Invalid PlatformData or no mipmaps available."));
 
         return TextureData;
     }
 
-    FTexture2DMipMap& Texture2DMipMap = Texture2D->PlatformData->Mips[0];
+    FTexture2DMipMap& Texture2DMipMap = Texture2D->GetPlatformData()->Mips[0];
 
     void* Data = Texture2DMipMap.BulkData.Lock(LOCK_READ_ONLY);
 
@@ -106,7 +106,7 @@ TArray<uint8> UTextureConvertLibrary::ConvertTextureToByteArray(UTexture2D* Text
     return TextureData;
 }
 
-UTexture2D* UTextureConvertLibrary::ConvertByteArrayToTexture(const TArray<uint8>& ByteArray, const int32 TextureWidth, const int32 TextureHeight)
+UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertByteArrayToTexture(const TArray<uint8>& ByteArray, const int32 TextureWidth, const int32 TextureHeight)
 {
     UTexture2D* Texture2D = UTexture2D::CreateTransient(TextureWidth, TextureHeight, EPixelFormat::PF_B8G8R8A8);
 
@@ -117,7 +117,7 @@ UTexture2D* UTextureConvertLibrary::ConvertByteArrayToTexture(const TArray<uint8
         return nullptr;
     }
 
-    int32 BulkDataSize = Texture2D->PlatformData->Mips[0].BulkData.GetBulkDataSize();
+    int32 BulkDataSize = Texture2D->GetPlatformData()->Mips[0].BulkData.GetBulkDataSize();
 
     if (ByteArray.Num() != BulkDataSize)
     {
@@ -128,18 +128,18 @@ UTexture2D* UTextureConvertLibrary::ConvertByteArrayToTexture(const TArray<uint8
 
     void* TextureData = nullptr;
 
-    TextureData = Texture2D->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+    TextureData = Texture2D->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
 
     FMemory::Memcpy(TextureData, ByteArray.GetData(), ByteArray.Num());
 
-    Texture2D->PlatformData->Mips[0].BulkData.Unlock();
+    Texture2D->GetPlatformData()->Mips[0].BulkData.Unlock();
 
     Texture2D->UpdateResource();
 
     return Texture2D;
 }
 
-TArray<uint8> UTextureConvertLibrary::ConvertTextureToPngData(UTexture2D* Texture2D)
+TArray<uint8> UTsubasamusuTextureConvertLibrary::ConvertTextureToPngData(UTexture2D* Texture2D)
 {
     TArray<uint8> PngData;
 
@@ -150,7 +150,7 @@ TArray<uint8> UTextureConvertLibrary::ConvertTextureToPngData(UTexture2D* Textur
         return PngData;
     }
 
-    if (!Texture2D->PlatformData || Texture2D->PlatformData->Mips.Num() == 0)
+    if (!Texture2D->GetPlatformData() || Texture2D->GetPlatformData()->Mips.Num() == 0)
     {
         UTsubasamusuLogLibrary::LogError(TEXT("Invalid PlatformData or no mipmaps available."));
 
@@ -164,7 +164,7 @@ TArray<uint8> UTextureConvertLibrary::ConvertTextureToPngData(UTexture2D* Textur
         return PngData;
     }
 
-    FTexture2DMipMap& Mip = Texture2D->PlatformData->Mips[0];
+    FTexture2DMipMap& Mip = Texture2D->GetPlatformData()->Mips[0];
 
     void* Data = Mip.BulkData.Lock(LOCK_READ_ONLY);
 
