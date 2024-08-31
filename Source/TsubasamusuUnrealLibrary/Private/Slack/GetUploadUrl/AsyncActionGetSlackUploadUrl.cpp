@@ -4,7 +4,6 @@
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
 #include "JsonObjectConverter.h"
-#include "Slack/GetUploadUrl/SlackUploadUrlResponse.h"
 
 UAsyncActionGetSlackUploadUrl* UAsyncActionGetSlackUploadUrl::AsyncGetUrlForUploadFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& FileName, const int32 FileSize)
 {
