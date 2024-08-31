@@ -1,4 +1,4 @@
-#include "Slack/GetUploadUrl/GetSlackUploadUrlAsyncAction.h"
+#include "Slack/GetUploadUrl/AsyncActionGetSlackUploadUrl.h"
 #include "Http/TsubasamusuUrlLibrary.h"
 #include "Debug/TsubasamusuLogLibrary.h"
 #include "HttpModule.h"
@@ -6,18 +6,20 @@
 #include "JsonObjectConverter.h"
 #include "Slack/GetUploadUrl/SlackUploadUrlResponse.h"
 
-UGetSlackUploadUrlAsyncAction* UGetSlackUploadUrlAsyncAction::AsyncGetUrlForUploadFileToSlack(const FString& Token, const FString& FileName, const int32 FileSize)
+UAsyncActionGetSlackUploadUrl* UAsyncActionGetSlackUploadUrl::AsyncGetUrlForUploadFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& FileName, const int32 FileSize)
 {
-	UGetSlackUploadUrlAsyncAction* GetSlackUploadUrlAsyncAction = NewObject<UGetSlackUploadUrlAsyncAction>();
+	UAsyncActionGetSlackUploadUrl* Action = NewObject<UAsyncActionGetSlackUploadUrl>();
 
-	GetSlackUploadUrlAsyncAction->Token = Token;
-	GetSlackUploadUrlAsyncAction->FileName = FileName;
-	GetSlackUploadUrlAsyncAction->FileSize = FileSize;
+	Action->Token = Token;
+	Action->FileName = FileName;
+	Action->FileSize = FileSize;
 
-	return GetSlackUploadUrlAsyncAction;
+    Action->RegisterWithGameInstance(WorldContextObject);
+
+	return Action;
 }
 
-void UGetSlackUploadUrlAsyncAction::Activate()
+void UAsyncActionGetSlackUploadUrl::Activate()
 {
     FHttpModule* HttpModule = &FHttpModule::Get();
 
@@ -89,12 +91,14 @@ void UGetSlackUploadUrlAsyncAction::Activate()
     if (!HttpRequest->ProcessRequest()) OnFailed(TEXT("process a HTTP request"));
 }
 
-void UGetSlackUploadUrlAsyncAction::OnCompleted(const FSlackUploadUrlResponse& Response)
+void UAsyncActionGetSlackUploadUrl::OnCompleted(const FSlackUploadUrlResponse& Response)
 {
     Completed.Broadcast(Response);
+
+    SetReadyToDestroy();
 }
 
-void UGetSlackUploadUrlAsyncAction::OnFailed(const FString& TriedThing, const FSlackUploadUrlResponse& Response)
+void UAsyncActionGetSlackUploadUrl::OnFailed(const FString& TriedThing, const FSlackUploadUrlResponse& Response)
 {
     UTsubasamusuLogLibrary::LogError(TEXT("Failed to ") + TriedThing + TEXT(" to get a URL for upload a file to Slack."));
 
