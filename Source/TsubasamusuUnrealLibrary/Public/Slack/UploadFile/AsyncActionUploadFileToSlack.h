@@ -4,7 +4,7 @@
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "AsyncActionUploadFileToSlack.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAsyncUploadFileToSlackDelegate, const bool, bSuccess, const FString&, Response);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUploadedFileToSlack, const bool, bSuccess, const FString&, Response);
 
 UCLASS()
 class TSUBASAMUSUUNREALLIBRARY_API UAsyncActionUploadFileToSlack : public UBlueprintAsyncActionBase
@@ -13,7 +13,7 @@ class TSUBASAMUSUUNREALLIBRARY_API UAsyncActionUploadFileToSlack : public UBluep
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FAsyncUploadFileToSlackDelegate Completed;
+	FOnUploadedFileToSlack Completed;
 
 	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Slack", meta = (BlueprintInternalUseOnly = "true"))
 	static UAsyncActionUploadFileToSlack* AsyncUploadFileToSlack(const FString& Token, const FString& UploadURL, const FString& FileName, const TArray<uint8>& FileData);

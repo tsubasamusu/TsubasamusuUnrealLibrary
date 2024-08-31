@@ -5,7 +5,7 @@
 #include "SlackUploadUrlResponse.h"
 #include "AsyncActionGetSlackUploadUrl.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAsyncGetUrlForUploadFileToSlackDelegate, const FSlackUploadUrlResponse&, Response);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGotUrlForUploadFileToSlack, const FSlackUploadUrlResponse&, Response);
 
 UCLASS()
 class TSUBASAMUSUUNREALLIBRARY_API UAsyncActionGetSlackUploadUrl : public UBlueprintAsyncActionBase
@@ -14,7 +14,7 @@ class TSUBASAMUSUUNREALLIBRARY_API UAsyncActionGetSlackUploadUrl : public UBluep
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FAsyncGetUrlForUploadFileToSlackDelegate Completed;
+	FOnGotUrlForUploadFileToSlack Completed;
 
 	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Slack", meta = (BlueprintInternalUseOnly = "true"))
 	static UAsyncActionGetSlackUploadUrl* AsyncGetUrlForUploadFileToSlack(const FString& Token, const FString& FileName, const int32 FileSize);
