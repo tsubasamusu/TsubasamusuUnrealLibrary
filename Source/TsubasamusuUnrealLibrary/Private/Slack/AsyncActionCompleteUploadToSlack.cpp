@@ -1,41 +1,52 @@
-#include "Slack/GetUploadUrl/AsyncActionGetSlackUploadUrl.h"
-#include "Http/TsubasamusuUrlLibrary.h"
+#include "Slack/AsyncActionCompleteUploadToSlack.h"
 #include "Debug/TsubasamusuLogLibrary.h"
+#include "Http/TsubasamusuUrlLibrary.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
 #include "JsonObjectConverter.h"
-#include "Slack/GetUploadUrl/SlackUploadUrlResponse.h"
 
-UAsyncActionGetSlackUploadUrl* UAsyncActionGetSlackUploadUrl::AsyncGetUrlForUploadFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& FileName, const int32 FileSize)
+UAsyncActionCompleteUploadToSlack* UAsyncActionCompleteUploadToSlack::AsyncCompleteUploadFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& FileID, const FString& FileName, const FString& ChannelID, const FString& Message)
 {
-	UAsyncActionGetSlackUploadUrl* Action = NewObject<UAsyncActionGetSlackUploadUrl>();
+	UAsyncActionCompleteUploadToSlack* Action = NewObject<UAsyncActionCompleteUploadToSlack>();
 
 	Action->Token = Token;
+	Action->FileID = FileID;
 	Action->FileName = FileName;
-	Action->FileSize = FileSize;
+	Action->ChannelID = ChannelID;
+	Action->Message = Message;
 
     Action->RegisterWithGameInstance(WorldContextObject);
 
 	return Action;
 }
 
-void UAsyncActionGetSlackUploadUrl::Activate()
+void UAsyncActionCompleteUploadToSlack::Activate()
 {
     FHttpModule* HttpModule = &FHttpModule::Get();
 
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = HttpModule->CreateRequest();
 
-    const FString URL = TEXT("https://slack.com/api/files.getUploadURLExternal");
+    const FString URL = TEXT("https://slack.com/api/files.completeUploadExternal");
 
     TMap<FString, FString> QueryParameters =
     {
-        {TEXT("filename"), FileName},
-        {TEXT("length"), FString::FromInt(FileSize)}
+        {
+            TEXT("files"),
+            TEXT("[{\"id\":\"") + FileID + TEXT("\", \"title\":\"") + FileName + TEXT("\"}]")
+        },
+        {
+            TEXT("channel_id"),
+            ChannelID
+        },
+        {
+            TEXT("initial_comment"),
+            Message
+        }
     };
 
     HttpRequest->SetURL(UTsubasamusuUrlLibrary::AddQueryParameters(URL, QueryParameters));
 
-    HttpRequest->SetVerb(TEXT("GET"));
+    HttpRequest->SetVerb(TEXT("POST"));
 
     HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/x-www-form-urlencoded"));
     HttpRequest->SetHeader(TEXT("Authorization"), TEXT("Bearer ") + Token);
@@ -69,7 +80,7 @@ void UAsyncActionGetSlackUploadUrl::Activate()
                 return;
             }
 
-            FSlackUploadUrlResponse Response;
+            FSlackCompleteUploadResponse Response;
 
             if (!FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &Response, 0, 0))
             {
@@ -78,7 +89,7 @@ void UAsyncActionGetSlackUploadUrl::Activate()
                 return;
             }
 
-            if (!Response.ok || Response.upload_url.IsEmpty())
+            if (!Response.ok)
             {
                 OnFailed(TEXT("get a success response from Slack API"), Response);
 
@@ -91,16 +102,16 @@ void UAsyncActionGetSlackUploadUrl::Activate()
     if (!HttpRequest->ProcessRequest()) OnFailed(TEXT("process a HTTP request"));
 }
 
-void UAsyncActionGetSlackUploadUrl::OnCompleted(const FSlackUploadUrlResponse& Response)
+void UAsyncActionCompleteUploadToSlack::OnCompleted(const FSlackCompleteUploadResponse& Response)
 {
-    Completed.Broadcast(Response);
+	Completed.Broadcast(Response);
 
     SetReadyToDestroy();
 }
 
-void UAsyncActionGetSlackUploadUrl::OnFailed(const FString& TriedThing, const FSlackUploadUrlResponse& Response)
+void UAsyncActionCompleteUploadToSlack::OnFailed(const FString& TriedThing, const FSlackCompleteUploadResponse& Response)
 {
-    UTsubasamusuLogLibrary::LogError(TEXT("Failed to ") + TriedThing + TEXT(" to get a URL for upload a file to Slack."));
+	UTsubasamusuLogLibrary::LogError(TEXT("Failed to ") + TriedThing + TEXT(" to complete uploading a file to Slack."));
 
-    OnCompleted(Response);
+	OnCompleted(Response);
 }

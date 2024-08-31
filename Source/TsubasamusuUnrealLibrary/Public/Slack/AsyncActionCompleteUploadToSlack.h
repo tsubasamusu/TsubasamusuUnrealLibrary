@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
-#include "SlackCompleteUploadResponse.h"
+#include "Slack/Struct/SlackCompleteUploadResponse.h"
 #include "AsyncActionCompleteUploadToSlack.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCompletedUploadFileToSlack, const FSlackCompleteUploadResponse&, Response);

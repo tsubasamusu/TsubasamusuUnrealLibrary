@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
-#include "SlackUploadUrlResponse.h"
+#include "Slack/Struct/SlackUploadUrlResponse.h"
 #include "AsyncActionGetSlackUploadUrl.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGotUrlForUploadFileToSlack, const FSlackUploadUrlResponse&, Response);
