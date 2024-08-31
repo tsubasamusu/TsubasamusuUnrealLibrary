@@ -1,21 +1,23 @@
-#include "Slack/UploadFile/UploadFileToSlackAsyncAction.h"
+#include "Slack/UploadFile/AsyncActionUploadFileToSlack.h"
 #include "Debug/TsubasamusuLogLibrary.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
 
-UUploadFileToSlackAsyncAction* UUploadFileToSlackAsyncAction::AsyncUploadFileToSlack(const FString& Token, const FString& UploadURL, const FString& FileName, const TArray<uint8>& FileData)
+UAsyncActionUploadFileToSlack* UAsyncActionUploadFileToSlack::AsyncUploadFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& UploadURL, const FString& FileName, const TArray<uint8>& FileData)
 {
-	UUploadFileToSlackAsyncAction* UploadFileToSlackAsyncAction = NewObject<UUploadFileToSlackAsyncAction>();
+	UAsyncActionUploadFileToSlack* Action = NewObject<UAsyncActionUploadFileToSlack>();
 
-	UploadFileToSlackAsyncAction->Token = Token;
-	UploadFileToSlackAsyncAction->UploadURL = UploadURL;
-	UploadFileToSlackAsyncAction->FileName = FileName;
-	UploadFileToSlackAsyncAction->FileData = FileData;
+	Action->Token = Token;
+	Action->UploadURL = UploadURL;
+	Action->FileName = FileName;
+	Action->FileData = FileData;
 
-	return UploadFileToSlackAsyncAction;
+    Action->RegisterWithGameInstance(WorldContextObject);
+
+	return Action;
 }
 
-void UUploadFileToSlackAsyncAction::Activate()
+void UAsyncActionUploadFileToSlack::Activate()
 {
     FHttpModule* HttpModule = &FHttpModule::Get();
 
@@ -87,12 +89,14 @@ void UUploadFileToSlackAsyncAction::Activate()
     if (!HttpRequest->ProcessRequest()) OnFailed(TEXT("process a HTTP request"));
 }
 
-void UUploadFileToSlackAsyncAction::OnCompleted(const bool& bSuccess, const FString& Response)
+void UAsyncActionUploadFileToSlack::OnCompleted(const bool& bSuccess, const FString& Response)
 {
     Completed.Broadcast(bSuccess, Response);
+
+    SetReadyToDestroy();
 }
 
-void UUploadFileToSlackAsyncAction::OnFailed(const FString& TriedThing, const FString& Response)
+void UAsyncActionUploadFileToSlack::OnFailed(const FString& TriedThing, const FString& Response)
 {
     UTsubasamusuLogLibrary::LogError(TEXT("Failed to ") + TriedThing + TEXT(" to upload a file to Slack."));
 

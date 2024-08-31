@@ -10,12 +10,12 @@ class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuLogLibrary : public UBlueprintFun
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug", meta = (Keywords = "log"))
+	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug")
 	static void Log(const FString Message, const bool bShowInViewport = true, const float DisplayTime = 2.0f);
 
-	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug", meta = (Keywords = "log warning"))
+	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug")
 	static void LogWarning(const FString Message, const bool bShowInViewport = true, const float DisplayTime = 2.0f);
 
-	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug", meta = (Keywords = "log error"))
+	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug")
 	static void LogError(const FString Message, const bool bShowInViewport = true, const float DisplayTime = 2.0f);
 };

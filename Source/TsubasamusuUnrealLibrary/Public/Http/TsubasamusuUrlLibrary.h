@@ -10,6 +10,6 @@ class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuUrlLibrary : public UBlueprintFun
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|HTTP", meta = (Keywords = "add query parameters"))
+	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|HTTP")
 	static FString AddQueryParameters(const FString& SourceURL, const TMap<FString, FString>& QueryParameters);
 };

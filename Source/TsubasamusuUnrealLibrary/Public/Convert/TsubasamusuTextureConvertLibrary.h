@@ -10,15 +10,15 @@ class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuTextureConvertLibrary : public UB
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert", meta = (Keywords = "convert texture render target to texture 2d"))
+	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert")
 	static UTexture2D* ConvertTextureRenderTargetToTexture2D(UTextureRenderTarget2D* TextureRenderTarget2D);
 
-	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert", meta = (Keywords = "convert texture to byte array"))
+	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert")
 	static TArray<uint8> ConvertTextureToByteArray(UTexture2D* Texture2D);
 
-	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert", meta = (Keywords = "convert byte array to texture"))
+	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert")
 	static UTexture2D* ConvertByteArrayToTexture(const TArray<uint8>& ByteArray, const int32 TextureWidth = 512, const int32 TextureHeight = 512);
 
-	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert", meta = (Keywords = "convert texture to png data"))
+	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert")
 	static TArray<uint8> ConvertTextureToPngData(UTexture2D* Texture2D);
 };
