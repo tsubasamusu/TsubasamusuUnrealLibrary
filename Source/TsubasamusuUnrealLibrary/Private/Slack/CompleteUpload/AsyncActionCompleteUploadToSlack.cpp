@@ -1,13 +1,13 @@
-#include "Slack/CompleteUpload/CompleteUploadToSlackAsyncAction.h"
+#include "Slack/CompleteUpload/AsyncActionCompleteUploadToSlack.h"
 #include "Debug/TsubasamusuLogLibrary.h"
 #include "Http/TsubasamusuUrlLibrary.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
 #include "JsonObjectConverter.h"
 
-UCompleteUploadToSlackAsyncAction* UCompleteUploadToSlackAsyncAction::AsyncCompleteUploadFileToSlack(const FString& Token, const FString& FileID, const FString& FileName, const FString& ChannelID, const FString& Message)
+UAsyncActionCompleteUploadToSlack* UAsyncActionCompleteUploadToSlack::AsyncCompleteUploadFileToSlack(const FString& Token, const FString& FileID, const FString& FileName, const FString& ChannelID, const FString& Message)
 {
-	UCompleteUploadToSlackAsyncAction* CompleteUploadToSlackAsyncAction = NewObject<UCompleteUploadToSlackAsyncAction>();
+	UAsyncActionCompleteUploadToSlack* CompleteUploadToSlackAsyncAction = NewObject<UAsyncActionCompleteUploadToSlack>();
 
 	CompleteUploadToSlackAsyncAction->Token = Token;
 	CompleteUploadToSlackAsyncAction->FileID = FileID;
@@ -18,7 +18,7 @@ UCompleteUploadToSlackAsyncAction* UCompleteUploadToSlackAsyncAction::AsyncCompl
 	return CompleteUploadToSlackAsyncAction;
 }
 
-void UCompleteUploadToSlackAsyncAction::Activate()
+void UAsyncActionCompleteUploadToSlack::Activate()
 {
     FHttpModule* HttpModule = &FHttpModule::Get();
 
@@ -100,12 +100,12 @@ void UCompleteUploadToSlackAsyncAction::Activate()
     if (!HttpRequest->ProcessRequest()) OnFailed(TEXT("process a HTTP request"));
 }
 
-void UCompleteUploadToSlackAsyncAction::OnCompleted(const FSlackCompleteUploadResponse& Response)
+void UAsyncActionCompleteUploadToSlack::OnCompleted(const FSlackCompleteUploadResponse& Response)
 {
 	Completed.Broadcast(Response);
 }
 
-void UCompleteUploadToSlackAsyncAction::OnFailed(const FString& TriedThing, const FSlackCompleteUploadResponse& Response)
+void UAsyncActionCompleteUploadToSlack::OnFailed(const FString& TriedThing, const FSlackCompleteUploadResponse& Response)
 {
 	UTsubasamusuLogLibrary::LogError(TEXT("Failed to ") + TriedThing + TEXT(" to complete uploading a file to Slack."));
 
