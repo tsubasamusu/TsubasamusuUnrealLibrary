@@ -3,12 +3,12 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "SlackUploadUrlResponse.h"
-#include "GetSlackUploadUrlAsyncAction.generated.h"
+#include "AsyncActionGetSlackUploadUrl.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAsyncGetUrlForUploadFileToSlackDelegate, const FSlackUploadUrlResponse&, Response);
 
 UCLASS()
-class TSUBASAMUSUUNREALLIBRARY_API UGetSlackUploadUrlAsyncAction : public UBlueprintAsyncActionBase
+class TSUBASAMUSUUNREALLIBRARY_API UAsyncActionGetSlackUploadUrl : public UBlueprintAsyncActionBase
 {
 	GENERATED_BODY()
 
@@ -17,7 +17,7 @@ public:
 	FAsyncGetUrlForUploadFileToSlackDelegate Completed;
 
 	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Slack", meta = (BlueprintInternalUseOnly = "true"))
-	static UGetSlackUploadUrlAsyncAction* AsyncGetUrlForUploadFileToSlack(const FString& Token, const FString& FileName, const int32 FileSize);
+	static UAsyncActionGetSlackUploadUrl* AsyncGetUrlForUploadFileToSlack(const FString& Token, const FString& FileName, const int32 FileSize);
 
 	void Activate() override;
 

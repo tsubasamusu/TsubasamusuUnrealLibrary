@@ -1,4 +1,4 @@
-#include "Slack/GetUploadUrl/GetSlackUploadUrlAsyncAction.h"
+#include "Slack/GetUploadUrl/AsyncActionGetSlackUploadUrl.h"
 #include "Http/TsubasamusuUrlLibrary.h"
 #include "Debug/TsubasamusuLogLibrary.h"
 #include "HttpModule.h"
@@ -6,9 +6,9 @@
 #include "JsonObjectConverter.h"
 #include "Slack/GetUploadUrl/SlackUploadUrlResponse.h"
 
-UGetSlackUploadUrlAsyncAction* UGetSlackUploadUrlAsyncAction::AsyncGetUrlForUploadFileToSlack(const FString& Token, const FString& FileName, const int32 FileSize)
+UAsyncActionGetSlackUploadUrl* UAsyncActionGetSlackUploadUrl::AsyncGetUrlForUploadFileToSlack(const FString& Token, const FString& FileName, const int32 FileSize)
 {
-	UGetSlackUploadUrlAsyncAction* GetSlackUploadUrlAsyncAction = NewObject<UGetSlackUploadUrlAsyncAction>();
+	UAsyncActionGetSlackUploadUrl* GetSlackUploadUrlAsyncAction = NewObject<UAsyncActionGetSlackUploadUrl>();
 
 	GetSlackUploadUrlAsyncAction->Token = Token;
 	GetSlackUploadUrlAsyncAction->FileName = FileName;
@@ -17,7 +17,7 @@ UGetSlackUploadUrlAsyncAction* UGetSlackUploadUrlAsyncAction::AsyncGetUrlForUplo
 	return GetSlackUploadUrlAsyncAction;
 }
 
-void UGetSlackUploadUrlAsyncAction::Activate()
+void UAsyncActionGetSlackUploadUrl::Activate()
 {
     FHttpModule* HttpModule = &FHttpModule::Get();
 
@@ -89,12 +89,12 @@ void UGetSlackUploadUrlAsyncAction::Activate()
     if (!HttpRequest->ProcessRequest()) OnFailed(TEXT("process a HTTP request"));
 }
 
-void UGetSlackUploadUrlAsyncAction::OnCompleted(const FSlackUploadUrlResponse& Response)
+void UAsyncActionGetSlackUploadUrl::OnCompleted(const FSlackUploadUrlResponse& Response)
 {
     Completed.Broadcast(Response);
 }
 
-void UGetSlackUploadUrlAsyncAction::OnFailed(const FString& TriedThing, const FSlackUploadUrlResponse& Response)
+void UAsyncActionGetSlackUploadUrl::OnFailed(const FString& TriedThing, const FSlackUploadUrlResponse& Response)
 {
     UTsubasamusuLogLibrary::LogError(TEXT("Failed to ") + TriedThing + TEXT(" to get a URL for upload a file to Slack."));
 
