@@ -1,4 +1,4 @@
-#include "Slack/GetUploadUrl/AsyncActionGetSlackUploadUrl.h"
+#include "Slack/AsyncActionGetSlackUploadUrl.h"
 #include "Http/TsubasamusuUrlLibrary.h"
 #include "Debug/TsubasamusuLogLibrary.h"
 #include "HttpModule.h"
