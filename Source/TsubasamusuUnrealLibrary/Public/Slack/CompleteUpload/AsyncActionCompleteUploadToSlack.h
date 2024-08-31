@@ -16,8 +16,8 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnCompletedUploadFileToSlack Completed;
 
-	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Slack", meta = (BlueprintInternalUseOnly = "true"))
-	static UAsyncActionCompleteUploadToSlack* AsyncCompleteUploadFileToSlack(const FString& Token, const FString& FileID, const FString& FileName, const FString& ChannelID, const FString& Message);
+	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Slack", meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"))
+	static UAsyncActionCompleteUploadToSlack* AsyncCompleteUploadFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& FileID, const FString& FileName, const FString& ChannelID, const FString& Message);
 
 	void Activate() override;
 

@@ -3,16 +3,18 @@
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
 
-UAsyncActionUploadFileToSlack* UAsyncActionUploadFileToSlack::AsyncUploadFileToSlack(const FString& Token, const FString& UploadURL, const FString& FileName, const TArray<uint8>& FileData)
+UAsyncActionUploadFileToSlack* UAsyncActionUploadFileToSlack::AsyncUploadFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& UploadURL, const FString& FileName, const TArray<uint8>& FileData)
 {
-	UAsyncActionUploadFileToSlack* UploadFileToSlackAsyncAction = NewObject<UAsyncActionUploadFileToSlack>();
+	UAsyncActionUploadFileToSlack* Action = NewObject<UAsyncActionUploadFileToSlack>();
 
-	UploadFileToSlackAsyncAction->Token = Token;
-	UploadFileToSlackAsyncAction->UploadURL = UploadURL;
-	UploadFileToSlackAsyncAction->FileName = FileName;
-	UploadFileToSlackAsyncAction->FileData = FileData;
+	Action->Token = Token;
+	Action->UploadURL = UploadURL;
+	Action->FileName = FileName;
+	Action->FileData = FileData;
 
-	return UploadFileToSlackAsyncAction;
+    Action->RegisterWithGameInstance(WorldContextObject);
+
+	return Action;
 }
 
 void UAsyncActionUploadFileToSlack::Activate()
@@ -90,6 +92,8 @@ void UAsyncActionUploadFileToSlack::Activate()
 void UAsyncActionUploadFileToSlack::OnCompleted(const bool& bSuccess, const FString& Response)
 {
     Completed.Broadcast(bSuccess, Response);
+
+    SetReadyToDestroy();
 }
 
 void UAsyncActionUploadFileToSlack::OnFailed(const FString& TriedThing, const FString& Response)

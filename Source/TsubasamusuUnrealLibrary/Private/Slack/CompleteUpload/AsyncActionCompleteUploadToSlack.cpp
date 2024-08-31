@@ -5,17 +5,19 @@
 #include "Interfaces/IHttpResponse.h"
 #include "JsonObjectConverter.h"
 
-UAsyncActionCompleteUploadToSlack* UAsyncActionCompleteUploadToSlack::AsyncCompleteUploadFileToSlack(const FString& Token, const FString& FileID, const FString& FileName, const FString& ChannelID, const FString& Message)
+UAsyncActionCompleteUploadToSlack* UAsyncActionCompleteUploadToSlack::AsyncCompleteUploadFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& FileID, const FString& FileName, const FString& ChannelID, const FString& Message)
 {
-	UAsyncActionCompleteUploadToSlack* CompleteUploadToSlackAsyncAction = NewObject<UAsyncActionCompleteUploadToSlack>();
+	UAsyncActionCompleteUploadToSlack* Action = NewObject<UAsyncActionCompleteUploadToSlack>();
 
-	CompleteUploadToSlackAsyncAction->Token = Token;
-	CompleteUploadToSlackAsyncAction->FileID = FileID;
-	CompleteUploadToSlackAsyncAction->FileName = FileName;
-	CompleteUploadToSlackAsyncAction->ChannelID = ChannelID;
-	CompleteUploadToSlackAsyncAction->Message = Message;
+	Action->Token = Token;
+	Action->FileID = FileID;
+	Action->FileName = FileName;
+	Action->ChannelID = ChannelID;
+	Action->Message = Message;
 
-	return CompleteUploadToSlackAsyncAction;
+    Action->RegisterWithGameInstance(WorldContextObject);
+
+	return Action;
 }
 
 void UAsyncActionCompleteUploadToSlack::Activate()
@@ -103,6 +105,8 @@ void UAsyncActionCompleteUploadToSlack::Activate()
 void UAsyncActionCompleteUploadToSlack::OnCompleted(const FSlackCompleteUploadResponse& Response)
 {
 	Completed.Broadcast(Response);
+
+    SetReadyToDestroy();
 }
 
 void UAsyncActionCompleteUploadToSlack::OnFailed(const FString& TriedThing, const FSlackCompleteUploadResponse& Response)

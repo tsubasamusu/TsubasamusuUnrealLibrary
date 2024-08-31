@@ -6,15 +6,17 @@
 #include "JsonObjectConverter.h"
 #include "Slack/GetUploadUrl/SlackUploadUrlResponse.h"
 
-UAsyncActionGetSlackUploadUrl* UAsyncActionGetSlackUploadUrl::AsyncGetUrlForUploadFileToSlack(const FString& Token, const FString& FileName, const int32 FileSize)
+UAsyncActionGetSlackUploadUrl* UAsyncActionGetSlackUploadUrl::AsyncGetUrlForUploadFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& FileName, const int32 FileSize)
 {
-	UAsyncActionGetSlackUploadUrl* GetSlackUploadUrlAsyncAction = NewObject<UAsyncActionGetSlackUploadUrl>();
+	UAsyncActionGetSlackUploadUrl* Action = NewObject<UAsyncActionGetSlackUploadUrl>();
 
-	GetSlackUploadUrlAsyncAction->Token = Token;
-	GetSlackUploadUrlAsyncAction->FileName = FileName;
-	GetSlackUploadUrlAsyncAction->FileSize = FileSize;
+	Action->Token = Token;
+	Action->FileName = FileName;
+	Action->FileSize = FileSize;
 
-	return GetSlackUploadUrlAsyncAction;
+    Action->RegisterWithGameInstance(WorldContextObject);
+
+	return Action;
 }
 
 void UAsyncActionGetSlackUploadUrl::Activate()
@@ -92,6 +94,8 @@ void UAsyncActionGetSlackUploadUrl::Activate()
 void UAsyncActionGetSlackUploadUrl::OnCompleted(const FSlackUploadUrlResponse& Response)
 {
     Completed.Broadcast(Response);
+
+    SetReadyToDestroy();
 }
 
 void UAsyncActionGetSlackUploadUrl::OnFailed(const FString& TriedThing, const FSlackUploadUrlResponse& Response)
