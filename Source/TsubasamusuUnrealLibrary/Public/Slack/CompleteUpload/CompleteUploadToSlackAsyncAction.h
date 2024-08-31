@@ -16,7 +16,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FAsyncCompleteUploadFileToSlackDelegate Completed;
 
-	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Slack", meta = (BlueprintInternalUseOnly = "true", Keywords = "async upload file to slack"))
+	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Slack", meta = (BlueprintInternalUseOnly = "true"))
 	static UCompleteUploadToSlackAsyncAction* AsyncCompleteUploadFileToSlack(const FString& Token, const FString& FileID, const FString& FileName, const FString& ChannelID, const FString& Message);
 
 	void Activate() override;

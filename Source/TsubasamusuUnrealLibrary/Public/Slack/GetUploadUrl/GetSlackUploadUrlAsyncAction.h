@@ -16,7 +16,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FAsyncGetUrlForUploadFileToSlackDelegate Completed;
 
-	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Slack", meta = (BlueprintInternalUseOnly = "true", Keywords = "async get url for upload file to slack"))
+	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Slack", meta = (BlueprintInternalUseOnly = "true"))
 	static UGetSlackUploadUrlAsyncAction* AsyncGetUrlForUploadFileToSlack(const FString& Token, const FString& FileName, const int32 FileSize);
 
 	void Activate() override;
