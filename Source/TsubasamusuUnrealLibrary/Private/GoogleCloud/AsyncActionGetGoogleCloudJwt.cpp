@@ -21,7 +21,7 @@ void UAsyncActionGetGoogleCloudJwt::Activate()
 
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = HttpModule->CreateRequest();
 
-    HttpRequest->SetURL(TEXT("https://getgooglecloudjwt-2bbvw62uua-an.a.run.app"));
+    HttpRequest->SetURL(TEXT("https://get-google-cloud-jwt-987347081835.asia-northeast1.run.app"));
 
     HttpRequest->SetVerb(TEXT("POST"));
 
