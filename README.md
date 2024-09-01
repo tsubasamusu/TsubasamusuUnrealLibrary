@@ -20,6 +20,13 @@
 - ``DisplayTime``：ログをビューポートにも表示する際に何秒間表示するか
 
 ![image](https://github.com/user-attachments/assets/733ef8ee-f549-4765-add9-27e81cb8fb1d)
+## Google Cloud
+### Google Cloud の API を使用する際に必要な JSON Web Token を取得する
+- ``PrivateKey``：``"-----BEGIN PRIVATE KEY-----"`` で始まり、``"----END PRIVATE KEY-----"`` で終わる文字列
+- ``ServiceAccountEmailAddress``：``"{サービスアカウント名}@{プロジェクト名}-{ID}.iam.gserviceaccount.com"`` という形式のメールアドレス
+- ``Scopes``：``"https://www.googleapis.com/auth/{スコープ名}"`` の配列
+
+![image](https://github.com/user-attachments/assets/0e68bc38-1b57-43a1-8236-b22a9efda367)
 ## Graphic
 ### 任意の CameraComponent の視点の Texture2D を作成する
 
