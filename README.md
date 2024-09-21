@@ -30,7 +30,7 @@
 ## Graphic
 ### 任意の CameraComponent の視点の Texture2D を作成する
 
-![image](https://github.com/user-attachments/assets/6c707003-cba2-4778-a0b4-66bc31a7d5e3)
+![image](https://github.com/user-attachments/assets/5adc94f1-3f2b-415a-907a-b40f1cd86cc9)
 ## HTTP
 ### URL にクエリパラメータを追加する
 この例では ``"https://hoge?Key0=Value0&Key1=Value1"`` という文字列が返って来る。
