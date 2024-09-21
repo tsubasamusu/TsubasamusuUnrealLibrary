@@ -2,17 +2,18 @@
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
 
-UAsyncActionGetGoogleCloudJwt* UAsyncActionGetGoogleCloudJwt::AsyncGetGoogleCloudJwt(UObject* WorldContextObject, const FString& PrivateKey, const FString& ServiceAccountEmailAddress, const TArray<FString>& Scopes)
+UAsyncActionGetGoogleCloudJwt* UAsyncActionGetGoogleCloudJwt::AsyncGetGoogleCloudJwt(UObject* WorldContextObject, const FString& GoogleCloudRunUrl, const FString& PrivateKey, const FString& ServiceAccountEmailAddress, const TArray<FString>& Scopes)
 {
-	UAsyncActionGetGoogleCloudJwt* Action = NewObject<UAsyncActionGetGoogleCloudJwt>();
+    UAsyncActionGetGoogleCloudJwt* Action = NewObject<UAsyncActionGetGoogleCloudJwt>();
 
-	Action->PrivateKey = PrivateKey;
-	Action->ServiceAccountEmailAddress = ServiceAccountEmailAddress;
-	Action->Scopes = Scopes;
+    Action->GoogleCloudRunUrl = GoogleCloudRunUrl;
+    Action->PrivateKey = PrivateKey;
+    Action->ServiceAccountEmailAddress = ServiceAccountEmailAddress;
+    Action->Scopes = Scopes;
 
-	Action->RegisterWithGameInstance(WorldContextObject);
+    Action->RegisterWithGameInstance(WorldContextObject);
 
-	return Action;
+    return Action;
 }
 
 void UAsyncActionGetGoogleCloudJwt::Activate()
@@ -21,7 +22,7 @@ void UAsyncActionGetGoogleCloudJwt::Activate()
 
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = HttpModule->CreateRequest();
 
-    HttpRequest->SetURL(TEXT("https://get-google-cloud-jwt-987347081835.asia-northeast1.run.app"));
+    HttpRequest->SetURL(GoogleCloudRunUrl);
 
     HttpRequest->SetVerb(TEXT("POST"));
 
@@ -33,13 +34,13 @@ void UAsyncActionGetGoogleCloudJwt::Activate()
     JsonObject->SetStringField(TEXT("serviceAccountEmailAddress"), ServiceAccountEmailAddress);
     JsonObject->SetStringField(TEXT("scopes"), FString::Join(Scopes, TEXT(" ")));
 
-	FString JsonString;
+    FString JsonString;
 
-	TSharedRef<TJsonWriter<>> JsonWriter = TJsonWriterFactory<>::Create(&JsonString);
+    TSharedRef<TJsonWriter<>> JsonWriter = TJsonWriterFactory<>::Create(&JsonString);
 
-	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), JsonWriter);
+    FJsonSerializer::Serialize(JsonObject.ToSharedRef(), JsonWriter);
 
-	HttpRequest->SetContentAsString(JsonString);
+    HttpRequest->SetContentAsString(JsonString);
 
     HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequestPtr, FHttpResponsePtr HttpResponsePtr, bool bSuccess)
         {
