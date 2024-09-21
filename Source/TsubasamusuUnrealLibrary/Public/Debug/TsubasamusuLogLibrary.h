@@ -11,11 +11,11 @@ class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuLogLibrary : public UBlueprintFun
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug")
-	static void Log(const FString Message, const bool bShowInViewport = true, const float DisplayTime = 2.0f);
+	static void Log(const FString& Message, bool bShowInViewport = true, float DisplayTime = 2.0f);
 
 	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug")
-	static void LogWarning(const FString Message, const bool bShowInViewport = true, const float DisplayTime = 2.0f);
+	static void LogWarning(const FString& Message, bool bShowInViewport = true, float DisplayTime = 2.0f);
 
 	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug")
-	static void LogError(const FString Message, const bool bShowInViewport = true, const float DisplayTime = 2.0f);
+	static void LogError(const FString& Message, bool bShowInViewport = true, float DisplayTime = 2.0f);
 };
