@@ -17,7 +17,7 @@ public:
 	FOnGotUrlForUploadFileToSlack Completed;
 
 	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Slack", meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"))
-	static UAsyncActionGetSlackUploadUrl* AsyncGetUrlForUploadFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& FileName, const int32 FileSize);
+	static UAsyncActionGetSlackUploadUrl* AsyncGetUrlForUploadFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& FileName, int32 FileSize);
 
 	void Activate() override;
 

@@ -4,7 +4,7 @@
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "AsyncActionGetGoogleCloudJwt.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGotGoogleCloudJwt, const FString&, Message,const int64&, CurrentUnixTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGotGoogleCloudJwt, const FString&, Message, int64, CurrentUnixTime);
 
 UCLASS()
 class TSUBASAMUSUUNREALLIBRARY_API UAsyncActionGetGoogleCloudJwt : public UBlueprintAsyncActionBase
