@@ -16,11 +16,13 @@ public:
 	FOnGotGoogleCloudJwt Completed;
 
 	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|GoogleCloud", meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject", AutoCreateRefTerm = "Scopes"))
-	static UAsyncActionGetGoogleCloudJwt* AsyncGetGoogleCloudJwt(UObject* WorldContextObject, const FString& PrivateKey, const FString& ServiceAccountEmailAddress, const TArray<FString>& Scopes);
+	static UAsyncActionGetGoogleCloudJwt* AsyncGetGoogleCloudJwt(UObject* WorldContextObject, const FString& GoogleCloudRunUrl, const FString& PrivateKey, const FString& ServiceAccountEmailAddress, const TArray<FString>& Scopes);
 
 	void Activate() override;
 
 private:
+	FString GoogleCloudRunUrl;
+
 	FString PrivateKey;
 
 	FString ServiceAccountEmailAddress;
