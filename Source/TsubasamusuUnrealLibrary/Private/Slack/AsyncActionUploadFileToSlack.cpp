@@ -89,7 +89,7 @@ void UAsyncActionUploadFileToSlack::Activate()
     if (!HttpRequest->ProcessRequest()) OnFailed(TEXT("process a HTTP request"));
 }
 
-void UAsyncActionUploadFileToSlack::OnCompleted(const bool& bSuccess, const FString& Response)
+void UAsyncActionUploadFileToSlack::OnCompleted(bool bSuccess, const FString& Response)
 {
     Completed.Broadcast(bSuccess, Response);
 

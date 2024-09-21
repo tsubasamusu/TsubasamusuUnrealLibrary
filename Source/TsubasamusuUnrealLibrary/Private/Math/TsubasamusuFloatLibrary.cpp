@@ -1,7 +1,7 @@
 #include "Math/TsubasamusuFloatLibrary.h"
 #include "Debug/TsubasamusuLogLibrary.h"
 
-double UTsubasamusuFloatLibrary::CutDecimal(const double Value, const int32 DecimalPlace)
+double UTsubasamusuFloatLibrary::CutDecimal(double Value, int32 DecimalPlace)
 {
 	if (DecimalPlace < 1)
 	{

@@ -6,7 +6,7 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Debug/TsubasamusuLogLibrary.h"
 
-UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldContextObject, UCameraComponent* CameraComponent, int32 TextureWidth, int32 TextureHeight, FPostProcessSettings PostProcessSettings)
+UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldContextObject, UCameraComponent* CameraComponent, const FPostProcessSettings& PostProcessSettings, int32 TextureWidth, int32 TextureHeight)
 {
     if (!IsValid(WorldContextObject))
     {

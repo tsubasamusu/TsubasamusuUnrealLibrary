@@ -11,5 +11,5 @@ class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuFloatLibrary : public UBlueprintF
 
 public:
 	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Math")
-	static double CutDecimal(const double Value, const int32 DecimalPlace = 1);
+	static double CutDecimal(double Value, int32 DecimalPlace = 1);
 };
