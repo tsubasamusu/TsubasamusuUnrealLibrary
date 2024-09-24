@@ -12,13 +12,6 @@ UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTextu
         return nullptr;
     }
 
-    if (TextureRenderTarget2D->GetFormat() != EPixelFormat::PF_B8G8R8A8)
-    {
-        UTsubasamusuLogLibrary::LogError(TEXT("The format of the \"TextureRenderTarget2D\" should be \"EPixelFormat::PF_B8G8R8A8\"."));
-
-        return nullptr;
-    }
-
     UTexture2D* Texture2D = UTexture2D::CreateTransient(TextureRenderTarget2D->SizeX, TextureRenderTarget2D->SizeY, TextureRenderTarget2D->GetFormat());
 
     if (!IsValid(Texture2D))
@@ -61,13 +54,6 @@ TArray<uint8> UTsubasamusuTextureConvertLibrary::ConvertTextureToByteArray(UText
     if (!IsValid(Texture2D))
     {
         UTsubasamusuLogLibrary::LogError(TEXT("The \"Texture2D\" is not valid."));
-
-        return TextureData;
-    }
-
-    if (Texture2D->GetPixelFormat() != EPixelFormat::PF_B8G8R8A8)
-    {
-        UTsubasamusuLogLibrary::LogError(TEXT("The format of the \"Texture2D\" should be \"EPixelFormat::PF_B8G8R8A8\"."));
 
         return TextureData;
     }
@@ -153,13 +139,6 @@ TArray<uint8> UTsubasamusuTextureConvertLibrary::ConvertTextureToPngData(UTextur
     if (!Texture2D->GetPlatformData() || Texture2D->GetPlatformData()->Mips.Num() == 0)
     {
         UTsubasamusuLogLibrary::LogError(TEXT("Invalid PlatformData or no mipmaps available."));
-
-        return PngData;
-    }
-
-    if (Texture2D->GetPixelFormat() != EPixelFormat::PF_B8G8R8A8)
-    {
-        UTsubasamusuLogLibrary::LogError(TEXT("The format of the \"Texture2D\" should be \"EPixelFormat::PF_B8G8R8A8\"."));
 
         return PngData;
     }
