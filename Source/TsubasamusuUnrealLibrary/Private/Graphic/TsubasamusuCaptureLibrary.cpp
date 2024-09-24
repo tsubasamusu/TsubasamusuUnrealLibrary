@@ -6,7 +6,7 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Debug/TsubasamusuLogLibrary.h"
 
-UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldContextObject, UCameraComponent* CameraComponent, const FPostProcessSettings& PostProcessSettings, int32 TextureWidth, int32 TextureHeight)
+UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldContextObject, UCameraComponent* CameraComponent, const FPostProcessSettings& PostProcessSettings, int32 TextureWidth, int32 TextureHeight, ETextureRenderTargetFormat TextureRenderTargetFormat, ESceneCaptureSource SceneCaptureSource)
 {
     if (!IsValid(WorldContextObject))
     {
@@ -22,7 +22,7 @@ UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldConte
         return nullptr;
     }
 
-    UTextureRenderTarget2D* TextureRenderTarget2D = UKismetRenderingLibrary::CreateRenderTarget2D(WorldContextObject, TextureWidth, TextureHeight, ETextureRenderTargetFormat::RTF_RGBA8);
+    UTextureRenderTarget2D* TextureRenderTarget2D = UKismetRenderingLibrary::CreateRenderTarget2D(WorldContextObject, TextureWidth, TextureHeight, TextureRenderTargetFormat);
 
     if (!IsValid(TextureRenderTarget2D))
     {
@@ -45,7 +45,7 @@ UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldConte
 
     USceneCaptureComponent2D* SceneCaptureComponent2D = SceneCaptureActor->GetCaptureComponent2D();
 
-    SceneCaptureComponent2D->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
+    SceneCaptureComponent2D->CaptureSource = SceneCaptureSource;
     SceneCaptureComponent2D->bCaptureEveryFrame = false;
     SceneCaptureComponent2D->bCaptureOnMovement = false;
     SceneCaptureComponent2D->bAlwaysPersistRenderingState = true;
