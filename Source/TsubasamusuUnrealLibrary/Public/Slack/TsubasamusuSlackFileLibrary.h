@@ -31,9 +31,13 @@ private:
 
 	TArray<uint8> FileData;
 
-	void OnCompleted(bool bSuccess, const FString& Response);
+	void AsyncUploadFileToSlack(const FString& UploadURL, const FString& FileID);
+
+	void AsyncCompleteUploadFileToSlack(const FString& FileID);
 
 	void OnFailed(const FString& TriedThing, const FString& Response = FString());
 
 	void OnSucceeded(const FString& Response = FString());
+
+	void OnCompleted(bool bSuccess, const FString& Response);
 };
