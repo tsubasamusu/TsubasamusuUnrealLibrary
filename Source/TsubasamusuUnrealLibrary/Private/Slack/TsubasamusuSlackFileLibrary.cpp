@@ -1,4 +1,11 @@
 #include "Slack/TsubasamusuSlackFileLibrary.h"
+#include "JsonObjectConverter.h"
+#include "HttpModule.h"
+#include "Http/TsubasamusuUrlLibrary.h"
+#include "Slack/Struct/SlackUploadUrlResponse.h"
+#include "Interfaces/IHttpResponse.h"
+#include "Slack/Struct/SlackCompleteUploadResponse.h"
+#include "Debug/TsubasamusuLogLibrary.h"
 
 UTsubasamusuSlackFileLibrary* UTsubasamusuSlackFileLibrary::AsyncSendFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& FileName, const FString& ChannelID, const FString& Message, const TArray<uint8>& FileData)
 {
