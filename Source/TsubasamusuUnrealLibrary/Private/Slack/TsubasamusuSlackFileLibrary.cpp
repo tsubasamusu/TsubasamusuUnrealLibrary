@@ -2,17 +2,17 @@
 
 UTsubasamusuSlackFileLibrary* UTsubasamusuSlackFileLibrary::AsyncSendFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& FileName, const FString& ChannelID, const FString& Message, const TArray<uint8>& FileData)
 {
-	UTsubasamusuSlackFileLibrary* Action = NewObject<UTsubasamusuSlackFileLibrary>();
+    UTsubasamusuSlackFileLibrary* Action = NewObject<UTsubasamusuSlackFileLibrary>();
 
-	Action->Token = Token;
-	Action->FileName = FileName;
-	Action->ChannelID = ChannelID;
-	Action->Message = Message;
-	Action->FileData = FileData;
+    Action->Token = Token;
+    Action->FileName = FileName;
+    Action->ChannelID = ChannelID;
+    Action->Message = Message;
+    Action->FileData = FileData;
 
-	Action->RegisterWithGameInstance(WorldContextObject);
+    Action->RegisterWithGameInstance(WorldContextObject);
 
-	return Action;
+    return Action;
 }
 
 void UTsubasamusuSlackFileLibrary::Activate()
@@ -47,7 +47,7 @@ void UTsubasamusuSlackFileLibrary::Activate()
 
             if (!bSuccess)
             {
-                OnFailed(TEXT("send a HTTP request") , HttpResponsePtr->GetContentAsString());
+                OnFailed(TEXT("send a HTTP request"), HttpResponsePtr->GetContentAsString());
 
                 return;
             }
@@ -128,7 +128,7 @@ void UTsubasamusuSlackFileLibrary::AsyncUploadFileToSlack(const FString& UploadU
 
     HttpRequest->SetContent(Payload);
 
-    HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequestPtr, FHttpResponsePtr HttpResponsePtr, bool bSuccess)
+    HttpRequest->OnProcessRequestComplete().BindLambda([this, FileID](FHttpRequestPtr HttpRequestPtr, FHttpResponsePtr HttpResponsePtr, bool bSuccess)
         {
             if (!HttpResponsePtr.IsValid())
             {
@@ -153,7 +153,7 @@ void UTsubasamusuSlackFileLibrary::AsyncUploadFileToSlack(const FString& UploadU
                 return;
             }
 
-            OnSucceeded(HttpResponseMessage);
+            AsyncCompleteUploadFileToSlack(FileID);
         });
 
     if (!HttpRequest->ProcessRequest()) OnFailed(TEXT("process a HTTP request"));
@@ -161,18 +161,95 @@ void UTsubasamusuSlackFileLibrary::AsyncUploadFileToSlack(const FString& UploadU
 
 void UTsubasamusuSlackFileLibrary::AsyncCompleteUploadFileToSlack(const FString& FileID)
 {
-    
+    FHttpModule* HttpModule = &FHttpModule::Get();
+
+    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = HttpModule->CreateRequest();
+
+    const FString URL = TEXT("https://slack.com/api/files.completeUploadExternal");
+
+    TMap<FString, FString> QueryParameters =
+    {
+        {
+            TEXT("files"),
+            TEXT("[{\"id\":\"") + FileID + TEXT("\", \"title\":\"") + FileName + TEXT("\"}]")
+        },
+        {
+            TEXT("channel_id"),
+            ChannelID
+        },
+        {
+            TEXT("initial_comment"),
+            Message
+        }
+    };
+
+    HttpRequest->SetURL(UTsubasamusuUrlLibrary::AddQueryParameters(URL, QueryParameters));
+
+    HttpRequest->SetVerb(TEXT("POST"));
+
+    HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/x-www-form-urlencoded"));
+    HttpRequest->SetHeader(TEXT("Authorization"), TEXT("Bearer ") + Token);
+
+    HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequestPtr, FHttpResponsePtr HttpResponsePtr, bool bSuccess)
+        {
+            if (!HttpResponsePtr.IsValid())
+            {
+                OnFailed(TEXT("get a FHttpResponsePtr"));
+
+                return;
+            }
+
+            if (!bSuccess)
+            {
+                OnFailed(TEXT("send a HTTP request"), HttpResponsePtr->GetContentAsString());
+
+                return;
+            }
+
+            FString JsonResponse = HttpResponsePtr->GetContentAsString();
+
+            TSharedPtr<FJsonObject> JsonObject;
+
+            TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(JsonResponse);
+
+            if (!FJsonSerializer::Deserialize(JsonReader, JsonObject) || !JsonObject.IsValid())
+            {
+                OnFailed(TEXT("deserialize a JSON response"));
+
+                return;
+            }
+
+            FSlackCompleteUploadResponse Response;
+
+            if (!FJsonObjectConverter::JsonObjectToUStruct(JsonObject.ToSharedRef(), &Response, 0, 0))
+            {
+                OnFailed(TEXT("convert a FJsonObject to a struct"));
+
+                return;
+            }
+
+            if (!Response.ok)
+            {
+                OnFailed(TEXT("get a success response from Slack API"), Response.error);
+
+                return;
+            }
+
+            OnSucceeded();
+        });
+
+    if (!HttpRequest->ProcessRequest()) OnFailed(TEXT("process a HTTP request"));
 }
 
 void UTsubasamusuSlackFileLibrary::OnFailed(const FString& TriedThing, const FString& Response)
 {
-	FString ErrorMessage = TEXT("Failed to ") + TriedThing + TEXT(" to send a file to Slack.");
+    FString ErrorMessage = TEXT("Failed to ") + TriedThing + TEXT(" to send a file to Slack.");
 
     if (!Response.IsEmpty()) ErrorMessage = ErrorMessage + TEXT(" The error message is \"") + Response + TEXT("\".");
 
-	UTsubasamusuLogLibrary::LogError(ErrorMessage);
+    UTsubasamusuLogLibrary::LogError(ErrorMessage);
 
-	OnCompleted(false, ErrorMessage);
+    OnCompleted(false, ErrorMessage);
 }
 
 void UTsubasamusuSlackFileLibrary::OnSucceeded(const FString& Response)
