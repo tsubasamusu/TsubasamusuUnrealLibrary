@@ -35,12 +35,15 @@
 ![image](https://github.com/user-attachments/assets/e7f8583d-e28d-48d9-948b-c205c5f15d7c)
 ## Slack
 ### Slack の任意のチェンネルに任意のファイルを送信する
+- ``Token``：「xoxb-」から始まるトークン
+- ``FileName``：拡張子付きのファイル名
+- ``ChannelID``：「C」から始まる、送信先のチャンネルの ID
+- ``Message``：添付メッセージ
 - ``FileData``：対象のファイルを ``TArray<uint8>`` に変換した値
-- ``FileSize``：対象のファイルの ``TArray<uint8>`` の要素数
 
 ※ [Slack API](https://api.slack.com/) にてボットの権限に ``files:write`` を追加する必要がある
 
-![image](https://github.com/user-attachments/assets/a53565f5-13cd-45da-b1da-3f2685cca32f)
+![image](https://github.com/user-attachments/assets/d6ae57c4-fdea-4a47-9b93-b5420ab6d0b1)
 # 使用方法
 1. 「**Releases**」から最新版（**Latest**）の「**Source code**」をダウンロードする
 2. ダウンロードした ZIP ファイルを展開して UE プロジェクトのルートディレクトリにある **Plugins** フォルダ内に移動させる（ **Plugins** フォルダが無い場合は自分で作成する）
