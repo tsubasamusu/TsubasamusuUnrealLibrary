@@ -20,7 +20,8 @@ public class TsubasamusuUnrealLibrary : ModuleRules
             "SlateCore",
             "HTTP",
             "Json",
-            "JsonUtilities"
+            "JsonUtilities",
+            "OpenSSL"
         });
     }
 }
