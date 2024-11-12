@@ -1,15 +1,15 @@
-#include "GoogleCloud/AsyncActionGetGoogleCloudJwt.h"
+#include "Google/AsyncActionGetGoogleAccessToken.h"
 
-UAsyncActionGetGoogleCloudJwt* UAsyncActionGetGoogleCloudJwt::AsyncGetGoogleCloudJwt(UObject* WorldContextObject)
+UAsyncActionGetGoogleAccessToken* UAsyncActionGetGoogleAccessToken::AsyncGetGoogleAccessToken(UObject* WorldContextObject)
 {
-	UAsyncActionGetGoogleCloudJwt* Action = NewObject<UAsyncActionGetGoogleCloudJwt>();
+	UAsyncActionGetGoogleAccessToken* Action = NewObject<UAsyncActionGetGoogleAccessToken>();
 
 	Action->RegisterWithGameInstance(WorldContextObject);
 
 	return Action;
 }
 
-FString UAsyncActionGetGoogleCloudJwt::GetGoogleCloudJwtHeader()
+FString UAsyncActionGetGoogleAccessToken::GetGoogleAccessTokenHeader()
 {
 	TSharedPtr<FJsonObject> JsonObject = MakeShared<FJsonObject>();
 
@@ -27,7 +27,7 @@ FString UAsyncActionGetGoogleCloudJwt::GetGoogleCloudJwtHeader()
 	return TEXT("");
 }
 
-FString UAsyncActionGetGoogleCloudJwt::GetGoogleCloudJwtPayload(const FString& ServiceAccountMailAddress, const TArray<FString>& Scopes)
+FString UAsyncActionGetGoogleAccessToken::GetGoogleAccessTokenPayload(const FString& ServiceAccountMailAddress, const TArray<FString>& Scopes)
 {
 	IssuedUnixTime = FDateTime::UtcNow().ToUnixTimestamp();
 
@@ -50,21 +50,21 @@ FString UAsyncActionGetGoogleCloudJwt::GetGoogleCloudJwtPayload(const FString& S
 	return TEXT("");
 }
 
-void UAsyncActionGetGoogleCloudJwt::Activate()
+void UAsyncActionGetGoogleAccessToken::Activate()
 {
 
 }
 
-void UAsyncActionGetGoogleCloudJwt::OnCompleted(const FString& Message)
+void UAsyncActionGetGoogleAccessToken::OnCompleted(const FString& Message)
 {
 	Completed.Broadcast(Message, IssuedUnixTime, true);
 
 	SetReadyToDestroy();
 }
 
-void UAsyncActionGetGoogleCloudJwt::OnFailed(const FString& TriedThing, const FString& Message)
+void UAsyncActionGetGoogleAccessToken::OnFailed(const FString& TriedThing, const FString& Message)
 {
-	UTsubasamusuLogLibrary::LogError(TEXT("Failed to ") + TriedThing + TEXT(" to get a JSON Web Token for Google Cloud."));
+	UTsubasamusuLogLibrary::LogError(TEXT("Failed to ") + TriedThing + TEXT(" to get an AccessToken for Google Cloud."));
 
 	Completed.Broadcast(Message, -1, false);
 
