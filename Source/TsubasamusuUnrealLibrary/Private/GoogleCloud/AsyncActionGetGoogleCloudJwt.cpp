@@ -1,73 +1,63 @@
 #include "GoogleCloud/AsyncActionGetGoogleCloudJwt.h"
-#include "HttpModule.h"
-#include "Interfaces/IHttpResponse.h"
-#include "Debug/TsubasamusuLogLibrary.h"
 
-UAsyncActionGetGoogleCloudJwt* UAsyncActionGetGoogleCloudJwt::AsyncGetGoogleCloudJwt(UObject* WorldContextObject, const FString& GoogleCloudRunUrl, const FString& PrivateKey, const FString& ServiceAccountEmailAddress, const TArray<FString>& Scopes)
+UAsyncActionGetGoogleCloudJwt* UAsyncActionGetGoogleCloudJwt::AsyncGetGoogleCloudJwt(UObject* WorldContextObject)
 {
-    UAsyncActionGetGoogleCloudJwt* Action = NewObject<UAsyncActionGetGoogleCloudJwt>();
+	UAsyncActionGetGoogleCloudJwt* Action = NewObject<UAsyncActionGetGoogleCloudJwt>();
 
-    Action->GoogleCloudRunUrl = GoogleCloudRunUrl;
-    Action->PrivateKey = PrivateKey;
-    Action->ServiceAccountEmailAddress = ServiceAccountEmailAddress;
-    Action->Scopes = Scopes;
+	Action->RegisterWithGameInstance(WorldContextObject);
 
-    Action->RegisterWithGameInstance(WorldContextObject);
+	return Action;
+}
 
-    return Action;
+FString UAsyncActionGetGoogleCloudJwt::GetGoogleCloudJwtHeader()
+{
+	TSharedPtr<FJsonObject> JsonObject = MakeShared<FJsonObject>();
+
+	JsonObject->SetStringField(TEXT("alg"), TEXT("RS256"));
+	JsonObject->SetStringField(TEXT("typ"), TEXT("JWT"));
+
+	FString JsonString;
+
+	TSharedRef<TJsonWriter<>> JsonWriter = TJsonWriterFactory<>::Create(&JsonString);
+
+	if (FJsonSerializer::Serialize(JsonObject.ToSharedRef(), JsonWriter)) return JsonString;
+
+	OnFailed(TEXT("create a JSON header"));
+
+	return TEXT("");
+}
+
+FString UAsyncActionGetGoogleCloudJwt::GetGoogleCloudJwtPayload(const FString& ServiceAccountMailAddress, const TArray<FString>& Scopes)
+{
+	IssuedUnixTime = FDateTime::UtcNow().ToUnixTimestamp();
+
+	TSharedPtr<FJsonObject> JsonObject = MakeShared<FJsonObject>();
+
+	JsonObject->SetStringField(TEXT("iss"), ServiceAccountMailAddress);
+	JsonObject->SetStringField(TEXT("scope"), FString::Join(Scopes, TEXT(" ")));
+	JsonObject->SetStringField(TEXT("aud"), TEXT("https://oauth2.googleapis.com/token"));
+	JsonObject->SetNumberField(TEXT("exp"), IssuedUnixTime + 3600);
+	JsonObject->SetNumberField(TEXT("iat"), IssuedUnixTime);
+
+	FString JsonString;
+
+	TSharedRef<TJsonWriter<>> JsonWriter = TJsonWriterFactory<>::Create(&JsonString);
+
+	if (FJsonSerializer::Serialize(JsonObject.ToSharedRef(), JsonWriter)) return JsonString;
+
+	OnFailed(TEXT("create a JSON payload"));
+
+	return TEXT("");
 }
 
 void UAsyncActionGetGoogleCloudJwt::Activate()
 {
-    FHttpModule* HttpModule = &FHttpModule::Get();
 
-    TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = HttpModule->CreateRequest();
-
-    HttpRequest->SetURL(GoogleCloudRunUrl);
-
-    HttpRequest->SetVerb(TEXT("POST"));
-
-    HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-
-    TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
-
-    JsonObject->SetStringField(TEXT("privateKey"), PrivateKey);
-    JsonObject->SetStringField(TEXT("serviceAccountEmailAddress"), ServiceAccountEmailAddress);
-    JsonObject->SetStringField(TEXT("scopes"), FString::Join(Scopes, TEXT(" ")));
-
-    FString JsonString;
-
-    TSharedRef<TJsonWriter<>> JsonWriter = TJsonWriterFactory<>::Create(&JsonString);
-
-    FJsonSerializer::Serialize(JsonObject.ToSharedRef(), JsonWriter);
-
-    HttpRequest->SetContentAsString(JsonString);
-
-    HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequestPtr, FHttpResponsePtr HttpResponsePtr, bool bSuccess)
-        {
-            if (!bSuccess)
-            {
-                OnFailed(TEXT("send a HTTP request"));
-
-                return;
-            }
-
-            if (!HttpResponsePtr.IsValid())
-            {
-                OnFailed(TEXT("get a FHttpResponsePtr"));
-
-                return;
-            }
-
-            OnCompleted(HttpResponsePtr->GetContentAsString());
-        });
-
-    if (!HttpRequest->ProcessRequest()) OnFailed(TEXT("process a HTTP request"));
 }
 
 void UAsyncActionGetGoogleCloudJwt::OnCompleted(const FString& Message)
 {
-	Completed.Broadcast(Message, FDateTime::UtcNow().ToUnixTimestamp());
+	Completed.Broadcast(Message, IssuedUnixTime, true);
 
 	SetReadyToDestroy();
 }
@@ -76,5 +66,7 @@ void UAsyncActionGetGoogleCloudJwt::OnFailed(const FString& TriedThing, const FS
 {
 	UTsubasamusuLogLibrary::LogError(TEXT("Failed to ") + TriedThing + TEXT(" to get a JSON Web Token for Google Cloud."));
 
-	OnCompleted(Message);
+	Completed.Broadcast(Message, -1, false);
+
+	SetReadyToDestroy();
 }

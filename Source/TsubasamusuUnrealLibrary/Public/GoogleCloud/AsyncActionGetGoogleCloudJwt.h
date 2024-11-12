@@ -4,7 +4,7 @@
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "AsyncActionGetGoogleCloudJwt.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGotGoogleCloudJwt, const FString&, Message, int64, CurrentUnixTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnGotGoogleCloudJwt, const FString&, Message, int64, IssuedUnixTime, bool, bSuccess);
 
 UCLASS()
 class TSUBASAMUSUUNREALLIBRARY_API UAsyncActionGetGoogleCloudJwt : public UBlueprintAsyncActionBase
@@ -16,18 +16,18 @@ public:
 	FOnGotGoogleCloudJwt Completed;
 
 	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|GoogleCloud", meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject", AutoCreateRefTerm = "Scopes"))
-	static UAsyncActionGetGoogleCloudJwt* AsyncGetGoogleCloudJwt(UObject* WorldContextObject, const FString& GoogleCloudRunUrl, const FString& PrivateKey, const FString& ServiceAccountEmailAddress, const TArray<FString>& Scopes);
+	static UAsyncActionGetGoogleCloudJwt* AsyncGetGoogleCloudJwt(UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|GoogleCloud")
+	FString GetGoogleCloudJwtHeader();
+
+	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|GoogleCloud")
+	FString GetGoogleCloudJwtPayload(const FString& ServiceAccountMailAddress, const TArray<FString>& Scopes);
 
 	void Activate() override;
 
 private:
-	FString GoogleCloudRunUrl;
-
-	FString PrivateKey;
-
-	FString ServiceAccountEmailAddress;
-
-	TArray<FString> Scopes;
+	int64 IssuedUnixTime;
 
 	void OnCompleted(const FString& Message);
 
