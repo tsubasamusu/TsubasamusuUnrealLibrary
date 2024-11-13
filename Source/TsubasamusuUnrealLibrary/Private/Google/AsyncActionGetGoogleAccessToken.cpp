@@ -113,14 +113,15 @@ FString UAsyncActionGetGoogleAccessToken::GetGoogleAccessTokenHeader()
 
 FString UAsyncActionGetGoogleAccessToken::GetGoogleAccessTokenPayload()
 {
-	IssuedUnixTime = FDateTime::UtcNow().ToUnixTimestamp();
+	int64 IssuedUnixTime = FDateTime::UtcNow().ToUnixTimestamp();
+	ExpirationIssuedUnixTime = IssuedUnixTime + 3600;
 
 	TSharedPtr<FJsonObject> JsonObject = MakeShared<FJsonObject>();
 
 	JsonObject->SetStringField(TEXT("iss"), ServiceAccountMailAddress);
 	JsonObject->SetStringField(TEXT("scope"), FString::Join(Scopes, TEXT(" ")));
 	JsonObject->SetStringField(TEXT("aud"), TEXT("https://oauth2.googleapis.com/token"));
-	JsonObject->SetNumberField(TEXT("exp"), IssuedUnixTime + 3600);
+	JsonObject->SetNumberField(TEXT("exp"), ExpirationIssuedUnixTime);
 	JsonObject->SetNumberField(TEXT("iat"), IssuedUnixTime);
 
 	FString JsonString;
@@ -207,7 +208,7 @@ FString UAsyncActionGetGoogleAccessToken::GetGoogleCloudJsonContent()
 
 void UAsyncActionGetGoogleAccessToken::OnSucceeded(const FString& Message)
 {
-	Completed.Broadcast(Message, IssuedUnixTime, true);
+	Completed.Broadcast(Message, ExpirationIssuedUnixTime, true);
 
 	SetReadyToDestroy();
 }

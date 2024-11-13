@@ -4,7 +4,7 @@
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "AsyncActionGetGoogleAccessToken.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnGotGoogleAccessToken, const FString&, Message, int64, IssuedUnixTime, bool, bSucceeded);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnGotGoogleAccessToken, const FString&, Message, int64, ExpirationIssuedUnixTime, bool, bSucceeded);
 
 UCLASS()
 class TSUBASAMUSUUNREALLIBRARY_API UAsyncActionGetGoogleAccessToken : public UBlueprintAsyncActionBase
@@ -27,7 +27,7 @@ private:
 
 	TArray<FString> Scopes;
 
-	int64 IssuedUnixTime;
+	int64 ExpirationIssuedUnixTime;
 
 	FString GetGoogleAccessTokenHeader();
 
