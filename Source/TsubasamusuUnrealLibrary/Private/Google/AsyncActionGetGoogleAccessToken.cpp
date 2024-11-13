@@ -13,12 +13,11 @@ THIRD_PARTY_INCLUDES_START
 THIRD_PARTY_INCLUDES_END
 #undef UI
 
-UAsyncActionGetGoogleAccessToken* UAsyncActionGetGoogleAccessToken::AsyncGetGoogleAccessToken(UObject* WorldContextObject, const FString& PrivateKey, const FString& KeyId, const FString& ServiceAccountMailAddress, const TArray<FString>& Scopes)
+UAsyncActionGetGoogleAccessToken* UAsyncActionGetGoogleAccessToken::AsyncGetGoogleAccessToken(UObject* WorldContextObject, const FString& PrivateKey, const FString& ServiceAccountMailAddress, const TArray<FString>& Scopes)
 {
 	UAsyncActionGetGoogleAccessToken* Action = NewObject<UAsyncActionGetGoogleAccessToken>();
 
 	Action->PrivateKey = PrivateKey;
-	Action->KeyId = KeyId;
 	Action->ServiceAccountMailAddress = ServiceAccountMailAddress;
 	Action->Scopes = Scopes;
 
@@ -100,7 +99,6 @@ FString UAsyncActionGetGoogleAccessToken::GetGoogleAccessTokenHeader()
 
 	JsonObject->SetStringField(TEXT("alg"), TEXT("RS256"));
 	JsonObject->SetStringField(TEXT("typ"), TEXT("JWT"));
-	JsonObject->SetStringField(TEXT("kid"), KeyId);
 
 	FString JsonString;
 
