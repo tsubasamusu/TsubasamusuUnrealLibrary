@@ -9,7 +9,6 @@ THIRD_PARTY_INCLUDES_START
 #include <openssl/bio.h>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
-#include <openssl/err.h>
 THIRD_PARTY_INCLUDES_END
 #undef UI
 
@@ -178,7 +177,7 @@ FString UAsyncActionGetGoogleAccessToken::GetGoogleCloudJwt()
 	{
 		RSA_free(Rsa);
 
-		ERR_print_errors_fp(stderr);
+		OnFailed(TEXT("sign the RSA"));
 
 		return TEXT("");
 	}
