@@ -16,16 +16,26 @@ public:
 	FOnGotGoogleAccessToken Completed;
 
 	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Google", meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject", AutoCreateRefTerm = "Scopes"))
-	static UAsyncActionGetGoogleAccessToken* AsyncGetGoogleAccessToken(UObject* WorldContextObject);
+	static UAsyncActionGetGoogleAccessToken* AsyncGetGoogleAccessToken(UObject* WorldContextObject, const FString& PrivateKey, const FString& KeyId, const FString& ServiceAccountMailAddress, const TArray<FString>& Scopes);
 
 	void Activate() override;
 
 private:
+	FString PrivateKey;
+
+	FString KeyId;
+
+	FString ServiceAccountMailAddress;
+
+	TArray<FString> Scopes;
+
 	int64 IssuedUnixTime;
 
 	FString GetGoogleAccessTokenHeader();
 
-	FString GetGoogleAccessTokenPayload(const FString& ServiceAccountMailAddress, const TArray<FString>& Scopes);
+	FString GetGoogleAccessTokenPayload();
+
+	FString GetGoogleCloudJwt();
 
 	void OnCompleted(const FString& Message);
 
