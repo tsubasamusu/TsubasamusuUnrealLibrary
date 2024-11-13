@@ -10,12 +10,12 @@ class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuLogLibrary : public UBlueprintFun
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug")
-	static void Log(const FString& Message, bool bShowInViewport = true, float DisplayTime = 2.0f);
+	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug", meta = (AdvancedDisplay = "1"))
+	static void Log(const FString& Message = FString(TEXT("Log")), bool bShowInViewport = true, float DisplayTime = 5.0f, FLinearColor TextColor = FLinearColor::Green);
 
-	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug")
-	static void LogWarning(const FString& Message, bool bShowInViewport = true, float DisplayTime = 2.0f);
+	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug", meta = (AdvancedDisplay = "1"))
+	static void LogWarning(const FString& Message = FString(TEXT("Warning")), bool bShowInViewport = true, float DisplayTime = 5.0f, FLinearColor TextColor = FLinearColor::Yellow);
 
-	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug")
-	static void LogError(const FString& Message, bool bShowInViewport = true, float DisplayTime = 2.0f);
+	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Debug", meta = (AdvancedDisplay = "1"))
+	static void LogError(const FString& Message = FString(TEXT("Error")), bool bShowInViewport = true, float DisplayTime = 5.0f, FLinearColor TextColor = FLinearColor::Red);
 };
