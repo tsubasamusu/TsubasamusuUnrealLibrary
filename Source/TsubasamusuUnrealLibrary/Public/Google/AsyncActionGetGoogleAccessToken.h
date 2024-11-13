@@ -4,7 +4,7 @@
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "AsyncActionGetGoogleAccessToken.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnGotGoogleAccessToken, const FString&, Message, int64, IssuedUnixTime, bool, bSuccess);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnGotGoogleAccessToken, const FString&, Message, int64, IssuedUnixTime, bool, bSucceeded);
 
 UCLASS()
 class TSUBASAMUSUUNREALLIBRARY_API UAsyncActionGetGoogleAccessToken : public UBlueprintAsyncActionBase
@@ -37,7 +37,9 @@ private:
 
 	FString GetGoogleCloudJwt();
 
-	void OnCompleted(const FString& Message);
+	FString GetGoogleCloudJsonContent();
+
+	void OnSucceeded(const FString& Message);
 
 	void OnFailed(const FString& TriedThing, const FString& Message = FString());
 };

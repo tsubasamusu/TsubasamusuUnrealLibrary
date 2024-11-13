@@ -1,4 +1,7 @@
 #include "Google/AsyncActionGetGoogleAccessToken.h"
+#include "Interfaces/IHttpRequest.h"
+#include "HttpModule.h"
+#include "Interfaces/IHttpResponse.h"
 
 #define UI UI_ST
 THIRD_PARTY_INCLUDES_START
@@ -26,7 +29,69 @@ UAsyncActionGetGoogleAccessToken* UAsyncActionGetGoogleAccessToken::AsyncGetGoog
 
 void UAsyncActionGetGoogleAccessToken::Activate()
 {
-	GetGoogleCloudJwt();
+	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> HttpRequest = FHttpModule::Get().CreateRequest();
+
+	FString Url = TEXT("https://oauth2.googleapis.com/token");
+
+	HttpRequest->SetURL(Url);
+	HttpRequest->SetVerb(TEXT("POST"));
+	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	HttpRequest->SetContentAsString(GetGoogleCloudJsonContent());
+
+	HttpRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr HttpRequestPtr, FHttpResponsePtr HttpResponsePtr, bool bSucceeded)
+		{
+			if (!bSucceeded)
+			{
+				OnFailed(TEXT("send a HTTP request"));
+
+				return;
+			}
+
+			if (!HttpResponsePtr.IsValid())
+			{
+				OnFailed(TEXT("get a FHttpResponsePtr"));
+
+				return;
+			}
+
+			FString JsonResponse = HttpResponsePtr->GetContentAsString();
+
+			TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(JsonResponse);
+
+			TSharedPtr<FJsonObject> JsonObject;
+
+			if (!FJsonSerializer::Deserialize(JsonReader, JsonObject) || !JsonObject.IsValid())
+			{
+				OnFailed(TEXT("deserialize the JSON response"));
+
+				return;
+			}
+
+			FString AccessToken;
+
+			if (JsonObject->TryGetStringField(TEXT("access_token"), AccessToken))
+			{
+				OnSucceeded(AccessToken);
+
+				return;
+			}
+
+			FString ErrorMessage, ErrorDescription;
+
+			if (JsonObject->TryGetStringField(TEXT("error"), ErrorMessage) && JsonObject->TryGetStringField(TEXT("error_description"), ErrorDescription))
+			{
+				UTsubasamusuLogLibrary::LogError(TEXT("The error is \"") + ErrorMessage + TEXT("\"."));
+				UTsubasamusuLogLibrary::LogError(TEXT("The error description is \"") + ErrorDescription + TEXT("\"."));
+
+				OnFailed(TEXT("get string value of \"access_token\" field"));
+
+				return;
+			}
+
+			OnFailed(TEXT("get any field of the JSON response"));
+		});
+
+	if (!HttpRequest->ProcessRequest()) OnFailed(TEXT("process a HTTP request"));
 }
 
 FString UAsyncActionGetGoogleAccessToken::GetGoogleAccessTokenHeader()
@@ -73,7 +138,7 @@ FString UAsyncActionGetGoogleAccessToken::GetGoogleAccessTokenPayload()
 
 FString UAsyncActionGetGoogleAccessToken::GetGoogleCloudJwt()
 {
-	TArray<char> PrivateKeyCharArray = UTsubasamusuStringConvertLibrary::ConvertToCharArray(PrivateKey.Replace(TEXT("\\n"),TEXT("\n")));
+	TArray<char> PrivateKeyCharArray = UTsubasamusuStringConvertLibrary::ConvertToCharArray(PrivateKey.Replace(TEXT("\\n"), TEXT("\n")));
 
 	BIO* Bio = BIO_new_mem_buf((void*)PrivateKeyCharArray.GetData(), -1);
 
@@ -124,7 +189,25 @@ FString UAsyncActionGetGoogleAccessToken::GetGoogleCloudJwt()
 	return Message + TEXT(".") + FBase64::Encode(Signature, SignatureLen);
 }
 
-void UAsyncActionGetGoogleAccessToken::OnCompleted(const FString& Message)
+FString UAsyncActionGetGoogleAccessToken::GetGoogleCloudJsonContent()
+{
+	TSharedPtr<FJsonObject> JsonObject = MakeShared<FJsonObject>();
+
+	JsonObject->SetStringField(TEXT("grant_type"), TEXT("urn:ietf:params:oauth:grant-type:jwt-bearer"));
+	JsonObject->SetStringField(TEXT("assertion"), GetGoogleCloudJwt());
+
+	FString JsonString;
+
+	TSharedRef<TJsonWriter<>> JsonWriter = TJsonWriterFactory<>::Create(&JsonString);
+
+	if (FJsonSerializer::Serialize(JsonObject.ToSharedRef(), JsonWriter)) return JsonString;
+
+	OnFailed(TEXT("create a JSON content"));
+
+	return TEXT("");
+}
+
+void UAsyncActionGetGoogleAccessToken::OnSucceeded(const FString& Message)
 {
 	Completed.Broadcast(Message, IssuedUnixTime, true);
 
