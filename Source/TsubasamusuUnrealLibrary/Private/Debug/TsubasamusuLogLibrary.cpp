@@ -1,8 +1,12 @@
 #include "Debug/TsubasamusuLogLibrary.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogTsubasamusu, Log, All);
+DEFINE_LOG_CATEGORY_STATIC(LogTsubasamusuWarning, Warning, All);
+DEFINE_LOG_CATEGORY_STATIC(LogTsubasamusuError, Error, All);
+
 void UTsubasamusuLogLibrary::Log(const FString& Message, bool bShowInViewort, float DisplayTime)
 {
-	UE_LOG(LogTemp, Log, TEXT("%s"), *Message);
+	UE_LOG(LogTsubasamusu, Log, TEXT("%s"), *Message);
 
 	if (!bShowInViewort) return;
 
@@ -11,7 +15,7 @@ void UTsubasamusuLogLibrary::Log(const FString& Message, bool bShowInViewort, fl
 
 void UTsubasamusuLogLibrary::LogWarning(const FString& Message, bool bShowInViewort, float DisplayTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *Message);
+	UE_LOG(LogTsubasamusuWarning, Warning, TEXT("%s"), *Message);
 
 	if (!bShowInViewort) return;
 
@@ -20,7 +24,7 @@ void UTsubasamusuLogLibrary::LogWarning(const FString& Message, bool bShowInView
 
 void UTsubasamusuLogLibrary::LogError(const FString& Message, bool bShowInViewort, float DisplayTime)
 {
-	UE_LOG(LogTemp, Error, TEXT("%s"), *Message);
+	UE_LOG(LogTsubasamusuError, Error, TEXT("%s"), *Message);
 
 	if (!bShowInViewort) return;
 
