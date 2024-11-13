@@ -15,4 +15,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Convert|String")
 	static TArray<uint8> ConvertToUtf8(const FString& String);
+	
+	static TArray<char> ConvertToCharArray(const FString& String);
 };

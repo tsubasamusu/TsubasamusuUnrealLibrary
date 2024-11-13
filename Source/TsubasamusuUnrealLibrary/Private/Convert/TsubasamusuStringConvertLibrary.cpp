@@ -17,3 +17,16 @@ TArray<uint8> UTsubasamusuStringConvertLibrary::ConvertToUtf8(const FString& Str
 
     return StringData;
 }
+
+TArray<char> UTsubasamusuStringConvertLibrary::ConvertToCharArray(const FString& String)
+{
+    FTCHARToUTF8 UTF8String(*String);
+
+    TArray<char> CharArray;
+
+    CharArray.Reserve(UTF8String.Length());
+
+    CharArray.Append(UTF8String.Get(), UTF8String.Length());
+
+    return CharArray;
+}
