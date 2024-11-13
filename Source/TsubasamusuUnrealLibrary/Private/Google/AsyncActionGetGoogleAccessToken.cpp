@@ -67,7 +67,7 @@ void UAsyncActionGetGoogleAccessToken::Activate()
 
 			FString AccessToken;
 
-			if (JsonObject->TryGetStringField(TEXT("access_token"), AccessToken))
+			if (JsonObject->TryGetStringField(TEXT("access_token"), AccessToken) || JsonObject->TryGetStringField(TEXT("id_token"), AccessToken))
 			{
 				OnSucceeded(AccessToken);
 
@@ -81,12 +81,14 @@ void UAsyncActionGetGoogleAccessToken::Activate()
 				UTsubasamusuLogLibrary::LogError(TEXT("The error is \"") + ErrorMessage + TEXT("\"."));
 				UTsubasamusuLogLibrary::LogError(TEXT("The error description is \"") + ErrorDescription + TEXT("\"."));
 
-				OnFailed(TEXT("get string value of \"access_token\" field"));
+				OnFailed(TEXT("get access token field from the JSON response"));
 
 				return;
 			}
 
-			OnFailed(TEXT("get any field of the JSON response"));
+			UTsubasamusuLogLibrary::LogError(TEXT("The JSON response is \"") + JsonResponse + TEXT("\"."));
+
+			OnFailed(TEXT("get any field from the JSON response"));
 		});
 
 	if (!HttpRequest->ProcessRequest()) OnFailed(TEXT("process a HTTP request"));
@@ -113,14 +115,14 @@ FString UAsyncActionGetGoogleAccessToken::GetGoogleAccessTokenHeader()
 FString UAsyncActionGetGoogleAccessToken::GetGoogleAccessTokenPayload()
 {
 	int64 IssuedUnixTime = FDateTime::UtcNow().ToUnixTimestamp();
-	ExpirationIssuedUnixTime = IssuedUnixTime + 3600;
+	ExpirationUnixTime = IssuedUnixTime + 3600;
 
 	TSharedPtr<FJsonObject> JsonObject = MakeShared<FJsonObject>();
 
 	JsonObject->SetStringField(TEXT("iss"), ServiceAccountMailAddress);
 	JsonObject->SetStringField(TEXT("scope"), FString::Join(Scopes, TEXT(" ")));
 	JsonObject->SetStringField(TEXT("aud"), TEXT("https://oauth2.googleapis.com/token"));
-	JsonObject->SetNumberField(TEXT("exp"), ExpirationIssuedUnixTime);
+	JsonObject->SetNumberField(TEXT("exp"), ExpirationUnixTime);
 	JsonObject->SetNumberField(TEXT("iat"), IssuedUnixTime);
 
 	FString JsonString;
@@ -205,18 +207,18 @@ FString UAsyncActionGetGoogleAccessToken::GetGoogleCloudJsonContent()
 	return TEXT("");
 }
 
-void UAsyncActionGetGoogleAccessToken::OnSucceeded(const FString& Message)
+void UAsyncActionGetGoogleAccessToken::OnSucceeded(const FString& AccessToken)
 {
-	Completed.Broadcast(Message, ExpirationIssuedUnixTime, true);
+	Completed.Broadcast(AccessToken, ExpirationUnixTime, true);
 
 	SetReadyToDestroy();
 }
 
-void UAsyncActionGetGoogleAccessToken::OnFailed(const FString& TriedThing, const FString& Message)
+void UAsyncActionGetGoogleAccessToken::OnFailed(const FString& TriedThing)
 {
 	UTsubasamusuLogLibrary::LogError(TEXT("Failed to ") + TriedThing + TEXT(" to get an access token for Google Cloud."));
 
-	Completed.Broadcast(Message, -1, false);
+	Completed.Broadcast(TEXT(""), -1, false);
 
 	SetReadyToDestroy();
 }
