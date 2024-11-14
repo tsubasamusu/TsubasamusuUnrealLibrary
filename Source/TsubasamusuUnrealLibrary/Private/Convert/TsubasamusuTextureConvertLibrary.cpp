@@ -61,45 +61,63 @@ UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTextu
 
 TArray<uint8> UTsubasamusuTextureConvertLibrary::ConvertTextureToByteArray(UTexture2D* Texture)
 {
-    TArray<uint8> TextureData;
-
     if (!IsValid(Texture))
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("The \"Texture2D\" is not valid."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a byte array failed because the Texture2D is not valid."));
 
-        return TextureData;
+        return TArray<uint8>();
     }
 
-    if (!Texture->GetPlatformData() || Texture->GetPlatformData()->Mips.Num() == 0)
+    FTexturePlatformData* TexturePlatformData = Texture->GetPlatformData();
+
+    if (!TexturePlatformData)
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("Invalid PlatformData or no mipmaps available."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a byte array failed because getting a platform data from the Texture2D failed."));
 
-        return TextureData;
+        return TArray<uint8>();
     }
 
-    FTexture2DMipMap& Texture2DMipMap = Texture->GetPlatformData()->Mips[0];
+    if (TexturePlatformData->Mips.Num() == 0)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a byte array failed because no mipmaps available in the Texture2D."));
 
-    void* Data = Texture2DMipMap.BulkData.Lock(LOCK_READ_ONLY);
+        return TArray<uint8>();
+    }
+
+    FTexture2DMipMap& MipMap = TexturePlatformData->Mips[0];
+
+    int32 BulkDataSize = MipMap.BulkData.GetBulkDataSize();
+
+    if (BulkDataSize == 0)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a byte array failed because the bulk data size is 0."));
+
+        return TArray<uint8>();
+    }
+
+    void* Data = MipMap.BulkData.Lock(LOCK_READ_ONLY);
 
     if (!Data)
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("Failed to lock the texture data."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a byte array failed because locking the texture data failed."));
 
-        return TextureData;
+        MipMap.BulkData.Unlock();
+
+        return TArray<uint8>();
     }
 
-    int32 BulkDataSize = Texture2DMipMap.BulkData.GetBulkDataSize();
+    TArray<uint8> TextureData;
 
-    if (BulkDataSize > 0)
+    TextureData.Append(static_cast<uint8*>(Data), BulkDataSize);
+
+    MipMap.BulkData.Unlock();
+
+    if (TextureData.Num() == 0)
     {
-        TextureData.Append(static_cast<uint8*>(Data), BulkDataSize);
-    }
-    else
-    {
-        UTsubasamusuLogLibrary::LogError(TEXT("Bulk data size is zero."));
-    }
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a byte array failed because the texture data size is 0."));
 
-    Texture2DMipMap.BulkData.Unlock();
+        return TArray<uint8>();
+    }
 
     return TextureData;
 }
