@@ -3,16 +3,16 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "IImageWrapperModule.h"
 
-UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTexture2D(UTextureRenderTarget2D* TextureRenderTarget2D)
+UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTexture(UTextureRenderTarget2D* TextureRenderTarget)
 {
-    if (!IsValid(TextureRenderTarget2D))
+    if (!IsValid(TextureRenderTarget))
     {
         UTsubasamusuLogLibrary::LogError(TEXT("The \"TextureRenderTarget2D\" is not valid."));
 
         return nullptr;
     }
 
-    UTexture2D* Texture2D = UTexture2D::CreateTransient(TextureRenderTarget2D->SizeX, TextureRenderTarget2D->SizeY, TextureRenderTarget2D->GetFormat());
+    UTexture2D* Texture2D = UTexture2D::CreateTransient(TextureRenderTarget->SizeX, TextureRenderTarget->SizeY, TextureRenderTarget->GetFormat());
 
     if (!IsValid(Texture2D))
     {
@@ -21,7 +21,7 @@ UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTextu
         return nullptr;
     }
 
-    FTextureRenderTargetResource* TextureRenderTargetResource = TextureRenderTarget2D->GameThread_GetRenderTargetResource();
+    FTextureRenderTargetResource* TextureRenderTargetResource = TextureRenderTarget->GameThread_GetRenderTargetResource();
 
     TArray<FColor> ImageColors;
 
@@ -47,25 +47,25 @@ UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTextu
     return Texture2D;
 }
 
-TArray<uint8> UTsubasamusuTextureConvertLibrary::ConvertTextureToByteArray(UTexture2D* Texture2D)
+TArray<uint8> UTsubasamusuTextureConvertLibrary::ConvertTextureToByteArray(UTexture2D* Texture)
 {
     TArray<uint8> TextureData;
 
-    if (!IsValid(Texture2D))
+    if (!IsValid(Texture))
     {
         UTsubasamusuLogLibrary::LogError(TEXT("The \"Texture2D\" is not valid."));
 
         return TextureData;
     }
 
-    if (!Texture2D->GetPlatformData() || Texture2D->GetPlatformData()->Mips.Num() == 0)
+    if (!Texture->GetPlatformData() || Texture->GetPlatformData()->Mips.Num() == 0)
     {
         UTsubasamusuLogLibrary::LogError(TEXT("Invalid PlatformData or no mipmaps available."));
 
         return TextureData;
     }
 
-    FTexture2DMipMap& Texture2DMipMap = Texture2D->GetPlatformData()->Mips[0];
+    FTexture2DMipMap& Texture2DMipMap = Texture->GetPlatformData()->Mips[0];
 
     void* Data = Texture2DMipMap.BulkData.Lock(LOCK_READ_ONLY);
 
@@ -125,25 +125,25 @@ UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertByteArrayToTexture(const T
     return Texture2D;
 }
 
-TArray<uint8> UTsubasamusuTextureConvertLibrary::ConvertTextureToPngData(UTexture2D* Texture2D)
+TArray<uint8> UTsubasamusuTextureConvertLibrary::ConvertTextureToPngData(UTexture2D* Texture)
 {
     TArray<uint8> PngData;
 
-    if (!IsValid(Texture2D))
+    if (!IsValid(Texture))
     {
         UTsubasamusuLogLibrary::LogError(TEXT("The \"Texture2D\" is not valid."));
 
         return PngData;
     }
 
-    if (!Texture2D->GetPlatformData() || Texture2D->GetPlatformData()->Mips.Num() == 0)
+    if (!Texture->GetPlatformData() || Texture->GetPlatformData()->Mips.Num() == 0)
     {
         UTsubasamusuLogLibrary::LogError(TEXT("Invalid PlatformData or no mipmaps available."));
 
         return PngData;
     }
 
-    FTexture2DMipMap& Mip = Texture2D->GetPlatformData()->Mips[0];
+    FTexture2DMipMap& Mip = Texture->GetPlatformData()->Mips[0];
 
     void* Data = Mip.BulkData.Lock(LOCK_READ_ONLY);
 
@@ -154,8 +154,8 @@ TArray<uint8> UTsubasamusuTextureConvertLibrary::ConvertTextureToPngData(UTextur
         return PngData;
     }
 
-    int32 TextureWidth = Texture2D->GetSizeX();
-    int32 TextureHeight = Texture2D->GetSizeY();
+    int32 TextureWidth = Texture->GetSizeX();
+    int32 TextureHeight = Texture->GetSizeY();
 
     int32 ExpectedDataSize = TextureWidth * TextureHeight * 4;
 

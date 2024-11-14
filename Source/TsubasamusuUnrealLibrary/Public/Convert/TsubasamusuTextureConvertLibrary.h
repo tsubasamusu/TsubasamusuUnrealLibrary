@@ -10,15 +10,15 @@ class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuTextureConvertLibrary : public UB
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert")
-	static UTexture2D* ConvertTextureRenderTargetToTexture2D(UTextureRenderTarget2D* TextureRenderTarget2D);
+	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert|Texture")
+	static UTexture2D* ConvertTextureRenderTargetToTexture(UTextureRenderTarget2D* TextureRenderTarget);
 
-	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert")
-	static TArray<uint8> ConvertTextureToByteArray(UTexture2D* Texture2D);
+	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Convert|Texture")
+	static TArray<uint8> ConvertTextureToByteArray(UTexture2D* Texture);
 
-	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert")
-	static UTexture2D* ConvertByteArrayToTexture(const TArray<uint8>& ByteArray, int32 TextureWidth = 256, int32 TextureHeight = 256, EPixelFormat PixelFormat= PF_B8G8R8A8);
+	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert|Texture")
+	static UTexture2D* ConvertByteArrayToTexture(const TArray<uint8>& ByteArray, int32 TextureWidth = 256, int32 TextureHeight = 256, EPixelFormat PixelFormat = PF_B8G8R8A8);
 
-	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert")
-	static TArray<uint8> ConvertTextureToPngData(UTexture2D* Texture2D);
+	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Convert|Texture")
+	static TArray<uint8> ConvertTextureToPngData(UTexture2D* Texture);
 };
