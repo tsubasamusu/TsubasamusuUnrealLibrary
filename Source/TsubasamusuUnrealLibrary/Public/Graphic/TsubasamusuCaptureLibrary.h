@@ -11,6 +11,6 @@ class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuCaptureLibrary : public UBlueprin
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Graphic", meta = (WorldContext = "WorldContextObject"))
-	static UTexture2D* GetCameraViewTexture(UObject* WorldContextObject, UCameraComponent* CameraComponent, const FPostProcessSettings& PostProcessSettings, int32 TextureWidth = 256, int32 TextureHeight = 256, ETextureRenderTargetFormat TextureRenderTargetFormat = RTF_RGBA8_SRGB, ESceneCaptureSource SceneCaptureSource = SCS_FinalToneCurveHDR);
+	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Graphic", meta = (WorldContext = "WorldContextObject", AdvancedDisplay = "4"))
+	static UTexture2D* GetCameraViewTexture(UObject* WorldContextObject, UCameraComponent* TargetCameraComponent, int32 TextureWidth = 256, int32 TextureHeight = 256, FPostProcessSettings PostProcessSettings = FPostProcessSettings(), ETextureRenderTargetFormat TextureRenderTargetFormat = RTF_RGBA8_SRGB, ESceneCaptureSource SceneCaptureSource = SCS_FinalToneCurveHDR);
 };
