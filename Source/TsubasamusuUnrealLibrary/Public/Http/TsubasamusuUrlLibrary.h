@@ -11,5 +11,5 @@ class TSUBASAMUSUUNREALLIBRARY_API UTsubasamusuUrlLibrary : public UBlueprintFun
 
 public:
 	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|HTTP")
-	static FString AddQueryParameters(const FString& SourceURL, const TMap<FString, FString>& QueryParameters);
+	static FString AddQueryParameters(const FString& SourceUrl, const TMap<FString, FString>& QueryParameters);
 };
