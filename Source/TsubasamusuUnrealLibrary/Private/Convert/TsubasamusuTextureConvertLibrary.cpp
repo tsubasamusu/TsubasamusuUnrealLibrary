@@ -7,16 +7,16 @@ UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTextu
 {
     if (!IsValid(TextureRenderTarget))
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("The \"TextureRenderTarget2D\" is not valid."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed because the TextureRenderTarget2D is not valid."));
 
         return nullptr;
     }
 
-    UTexture2D* Texture2D = UTexture2D::CreateTransient(TextureRenderTarget->SizeX, TextureRenderTarget->SizeY, TextureRenderTarget->GetFormat());
+    UTexture2D* Texture = UTexture2D::CreateTransient(TextureRenderTarget->SizeX, TextureRenderTarget->SizeY, TextureRenderTarget->GetFormat());
 
-    if (!IsValid(Texture2D))
+    if (!IsValid(Texture))
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("Failed to create a Texture2D."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed because a Texture2D creation failed."));
 
         return nullptr;
     }
@@ -25,26 +25,38 @@ UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTextu
 
     TArray<FColor> ImageColors;
 
-    TextureRenderTargetResource->ReadPixels(ImageColors);
-
-    int32 ExpectedDataSize = Texture2D->GetPlatformData()->Mips[0].BulkData.GetBulkDataSize();
-
-    if (ImageColors.Num() * sizeof(FColor) != ExpectedDataSize)
+    if (!TextureRenderTargetResource->ReadPixels(ImageColors))
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("The data size mismatch."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed because reading pixels of the TextureRenderTargetResource failed."));
 
         return nullptr;
     }
 
-    void* TextureData = Texture2D->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+    int32 ExpectedDataSize = Texture->GetPlatformData()->Mips[0].BulkData.GetBulkDataSize();
+
+    if (ImageColors.Num() * sizeof(FColor) != ExpectedDataSize)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed because the data size mismatch."));
+
+        return nullptr;
+    }
+
+    void* TextureData = Texture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
 
     FMemory::Memcpy(TextureData, ImageColors.GetData(), ImageColors.Num() * sizeof(FColor));
 
-    Texture2D->GetPlatformData()->Mips[0].BulkData.Unlock();
+    Texture->GetPlatformData()->Mips[0].BulkData.Unlock();
 
-    Texture2D->UpdateResource();
+    Texture->UpdateResource();
 
-    return Texture2D;
+    if (!IsValid(Texture))
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed."));
+
+        return nullptr;
+    }
+
+    return Texture;
 }
 
 TArray<uint8> UTsubasamusuTextureConvertLibrary::ConvertTextureToByteArray(UTexture2D* Texture)
