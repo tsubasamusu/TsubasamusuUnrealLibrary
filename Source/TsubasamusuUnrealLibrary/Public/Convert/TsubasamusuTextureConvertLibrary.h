@@ -33,6 +33,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Convert|Texture")
 	static TArray<uint8> ConvertTextureToImageData(UTexture2D* Texture, EImageDataFormat ImageDataFormat = EImageDataFormat::PNG);
 
+	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Convert|Texture")
+	static UTexture2D* ConvertImageDataToTexture(const TArray<uint8>& ImageData, EImageDataFormat ImageDataFormat = EImageDataFormat::PNG);
+
 private:
 	static EImageFormat ConvertImageDataFormatToImageFormat(EImageDataFormat ImageDataFormat);
 };
