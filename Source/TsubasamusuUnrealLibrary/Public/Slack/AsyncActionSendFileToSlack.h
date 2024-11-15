@@ -31,6 +31,8 @@ private:
 
 	TArray<uint8> FileData;
 
+	void CompleteUploadFileToSlack(const FString& UploadUrl, const FString& FileId);
+
 	void OnSucceeded();
 
 	void OnFailed(const FString& TriedThing);
