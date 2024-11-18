@@ -4,7 +4,9 @@
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "AsyncActionSendFileToSlack.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCompletedSendFileToSlack, bool, bSucceeded);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSucceededToSendFileToSlack);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFailedToSendFileToSlack);
 
 UCLASS()
 class TSUBASAMUSUUNREALLIBRARY_API UAsyncActionSendFileToSlack : public UBlueprintAsyncActionBase
@@ -13,7 +15,10 @@ class TSUBASAMUSUUNREALLIBRARY_API UAsyncActionSendFileToSlack : public UBluepri
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FOnCompletedSendFileToSlack Completed;
+	FOnSucceededToSendFileToSlack Succeeded;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnFailedToSendFileToSlack Failed;
 
 	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"))
 	static UAsyncActionSendFileToSlack* AsyncSendFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& FileName, const FString& ChannelId, const FString& Message, const TArray<uint8>& FileData);
@@ -31,7 +36,7 @@ private:
 
 	TArray<uint8> FileData;
 
-	void CompleteUploadFileToSlack(const FString& UploadUrl, const FString& FileId);
+	void UploadFileToSlack(const FString& UploadUrl, const FString& FileId);
 
 	void OnSucceeded();
 

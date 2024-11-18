@@ -100,7 +100,7 @@ void UAsyncActionSendFileToSlack::Activate()
                     return;
                 }
 
-                CompleteUploadFileToSlack(UploadUrl, FileId);
+                UploadFileToSlack(UploadUrl, FileId);
 
                 return;
             }
@@ -124,14 +124,14 @@ void UAsyncActionSendFileToSlack::Activate()
     if (!HttpRequest->ProcessRequest()) OnFailed(TEXT("process a HTTP request"));
 }
 
-void UAsyncActionSendFileToSlack::CompleteUploadFileToSlack(const FString& UploadUrl, const FString& FileId)
+void UAsyncActionSendFileToSlack::UploadFileToSlack(const FString& UploadUrl, const FString& FileId)
 {
 
 }
 
 void UAsyncActionSendFileToSlack::OnSucceeded()
 {
-    Completed.Broadcast(true);
+    Succeeded.Broadcast();
 
     SetReadyToDestroy();
 }
@@ -140,7 +140,7 @@ void UAsyncActionSendFileToSlack::OnFailed(const FString& TriedThing)
 {
     UTsubasamusuLogLibrary::LogError(TEXT("Failed to ") + TriedThing + TEXT(" to send a file to Slack."));
 
-    Completed.Broadcast(false);
+    Failed.Broadcast();
 
     SetReadyToDestroy();
 }
