@@ -48,6 +48,10 @@
 <img width="500" src="https://github.com/user-attachments/assets/a3e5b2ed-93a5-4f66-bab0-1cd8c21140e8">
 
 # HTTP
+## URI をもとにサーバー上のファイル（``TArray<uint8>``）を取得する
+
+<img width="500" src="https://github.com/user-attachments/assets/3acd6dd7-6eb7-4b07-a675-39bb43bdbc37">
+
 ## URL にクエリパラメータを追加する
 この例では ``"https://tsubasamusu.com?Key0=Value0&Key1=Value1"`` という文字列が返って来る。
 
