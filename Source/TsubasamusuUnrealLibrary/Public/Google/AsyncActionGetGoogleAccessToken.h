@@ -4,7 +4,9 @@
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "AsyncActionGetGoogleAccessToken.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnGotGoogleAccessToken, const FString&, AccessToken, int64, ExpirationUnixTime, bool, bSucceeded);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSucceededToGetGoogleAccessToken, const FString&, AccessToken, int64, ExpirationUnixTime);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFailedToGetGoogleAccessToken);
 
 UCLASS()
 class TSUBASAMUSUUNREALLIBRARY_API UAsyncActionGetGoogleAccessToken : public UBlueprintAsyncActionBase
@@ -13,7 +15,10 @@ class TSUBASAMUSUUNREALLIBRARY_API UAsyncActionGetGoogleAccessToken : public UBl
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FOnGotGoogleAccessToken Completed;
+	FOnSucceededToGetGoogleAccessToken Succeeded;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnFailedToGetGoogleAccessToken Failed;
 
 	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Google", meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject", AutoCreateRefTerm = "Scopes"))
 	static UAsyncActionGetGoogleAccessToken* AsyncGetGoogleAccessToken(UObject* WorldContextObject, const FString& PrivateKey, const FString& ServiceAccountMailAddress, const TArray<FString>& Scopes);
