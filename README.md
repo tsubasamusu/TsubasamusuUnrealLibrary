@@ -73,8 +73,26 @@
 - ``FileName``：拡張子付きのファイル名
 - ``ChannelId``：「C」から始まる、送信先のチャンネルの ID
 - ``Message``：添付メッセージ
-- ``FileData``：対象のファイル（``TArray<uint8>``）
+- ``FileData``：送信したいファイル（``TArray<uint8>``）
 
 ※ [Slack API](https://api.slack.com/) にてボットの権限に ``files:write`` を追加する必要がある
 
 <img width="500" src="https://github.com/user-attachments/assets/9e366864-63d8-4d58-bad7-8729ee4a8f74">
+
+# Storage
+## ローカルファイルをロードして ``TArray<uint8>`` で取得する
+- ``LocalFileName``：拡張子付きのファイル名
+
+<img width="500" src="https://github.com/user-attachments/assets/245f983b-e957-4f35-b554-2912c1de2111">
+
+## 指定した名前のローカルファイルが存在するか確認する
+- ``LocalFileName``：拡張子付きのファイル名
+
+<img width="500" src="https://github.com/user-attachments/assets/a6783758-1c3f-4359-96f4-f7a1ea4dd160">
+
+## ファイルをローカルに保存する
+- ``LocalFileName``：拡張子付きのファイル名
+- ``FileData``：保存したいファイル（``TArray<uint8>``）
+- ``bOverwriteIfAlreadyExists``：指定した名前のファイルが既に存在する場合にそのファイルを上書きするかどうか
+
+<img width="500" src="https://github.com/user-attachments/assets/9bf4b86d-34fd-4841-82e8-f8a068d2a798">
