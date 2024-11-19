@@ -1,6 +1,6 @@
 # Convert
 ## String
-### 文字列を Base64 に変換する
+### 文字列を Base64 形式に変換する
 
 <img width="500" src="https://github.com/user-attachments/assets/24f2414f-5849-4dca-b86c-b2048ecfca26">
 
@@ -11,66 +11,66 @@
 ## Texture
 ### TextureRenderTarget2D を Texture2D に変換する
 
-<img width="500" src="https://github.com/user-attachments/assets/820d1511-396a-42be-abfb-1ee70b14461e">
+<img width="500" src="https://github.com/user-attachments/assets/b23aea2c-449a-492f-a69b-b81f6e86130d">
 
-### Texture2D とバイト配列（``TArray<uint8>``）の相互変換を行う
+### Texture2D を画像ファイル（``TArray<uint8>``）に変換する
 
-※ ``ConvertByteArrayToTexture()`` で変換後の Texture2D のサイズを指定する引数は変換前の Texture2D のそれと一致させる必要がある
+<img width="500" src="https://github.com/user-attachments/assets/42523d97-52d8-495b-8a16-2c80fd6c907c">
 
-<img width="500" src="https://github.com/user-attachments/assets/972f963b-9ffd-4ecf-b1bc-089d6c0774a5">
+### 画像ファイル（``TArray<uint8>``）を Texture2D に変換する
 
-### Texture2D を PNG データ（``TArray<uint8>``）に変換する
-
-<img width="500" src="https://github.com/user-attachments/assets/36134ea8-cdef-437e-965c-dec63469340a">
+<img width="500" src="https://github.com/user-attachments/assets/bd45ab31-32ca-4413-8310-0d615f492793">
 
 # Debug
 ## ログや警告、エラーをアウトプットログへ表示する
 - ``bShowInViewport``：ログをビューポートにも表示するかどうか
 - ``DisplayTime``：ログをビューポートにも表示する際に何秒間表示するか
+- ``TextColor``：ログをビューポートにも表示する際に何色のテキストで表示するか
 
-<img width="500" src="https://github.com/user-attachments/assets/733ef8ee-f549-4765-add9-27e81cb8fb1d">
+<img width="500" src="https://github.com/user-attachments/assets/e725f35c-66a8-4b10-b193-fa81d7e38636">
 
 # Google
 ## Google Cloud の API を使用する際に必要なアクセストークンを取得する
 - 引数
     - ``PrivateKey``：プライベートキー
     - ``ServiceAccountMailAddress``：サービスアカウントのメールアドレス
-    - ``Scopes``：認可スコープ（FString 型の配列）
-        - ``https://www.googleapis.com/auth/drive`` や ``https://www.googleapis.com/auth/spreadsheets`` 等
+    - ``Scopes``：認可スコープ（``TArray<FString>``）
+        - ``"https://www.googleapis.com/auth/drive"`` や ``"https://www.googleapis.com/auth/spreadsheets"`` 等
 - 戻り値
     - ``AccessToken``：アクセストークン
     - ``ExpirationUnixTime``：アクセストークンの有効期限
-    - ``bSucceeded``：アクセストークンの取得に成功したかどうか
 
-<img width="500" src="https://github.com/user-attachments/assets/421be06e-7dd8-421c-a46c-02c0275bed6e">
+<img width="500" src="https://github.com/user-attachments/assets/8690758d-0ee4-4f61-9633-f6f932c758af">
 
 # Graphic
-## 任意の CameraComponent の視点の Texture2D を作成する
+## 任意の CameraComponent の視点を Texture2D で取得する
 
-<img width="500" src="https://github.com/user-attachments/assets/c5f0f410-5269-469e-ba4c-773e5c41d4e7">
+<img width="500" src="https://github.com/user-attachments/assets/a3e5b2ed-93a5-4f66-bab0-1cd8c21140e8">
 
 # HTTP
 ## URL にクエリパラメータを追加する
-この例では ``"https://hoge?Key0=Value0&Key1=Value1"`` という文字列が返って来る。
+この例では ``"https://tsubasamusu.com?Key0=Value0&Key1=Value1"`` という文字列が返って来る。
 
-<img width="500" src="https://github.com/user-attachments/assets/75cba269-2469-4fde-aa43-1bc26266ccfe">
+<img width="500" src="https://github.com/user-attachments/assets/3417f932-4618-4f00-92b7-3344d8d2e1e7">
 
 # Math
 ## 小数点を任意の位で切り捨てる
+- ``DecimalPlace``：小数第何位まで残すか
+
 この例では ``1.2345`` を小数第二位まで保持し、小数第三位以下の値を切り捨てるため ``1.23`` という値が返って来る。
 
-※小数の桁数が増えたりすると正確な値を取得できない可能性がある
+※小数の桁数が増えたりすると正確な値を取得できなくなる可能性がある
 
 <img width="500" src="https://github.com/user-attachments/assets/e7f8583d-e28d-48d9-948b-c205c5f15d7c">
 
 # Slack
-## Slack の任意のチェンネルに任意のファイルを送信する
+## Slack の任意のチャンネルにファイルを送信する
 - ``Token``：「xoxb-」から始まるトークン
 - ``FileName``：拡張子付きのファイル名
-- ``ChannelID``：「C」から始まる、送信先のチャンネルの ID
+- ``ChannelId``：「C」から始まる、送信先のチャンネルの ID
 - ``Message``：添付メッセージ
-- ``FileData``：対象のファイルを ``TArray<uint8>`` に変換した値
+- ``FileData``：対象のファイル（``TArray<uint8>``）
 
 ※ [Slack API](https://api.slack.com/) にてボットの権限に ``files:write`` を追加する必要がある
 
-<img width="500" src="https://github.com/user-attachments/assets/d6ae57c4-fdea-4a47-9b93-b5420ab6d0b1">
+<img width="500" src="https://github.com/user-attachments/assets/9e366864-63d8-4d58-bad7-8729ee4a8f74">
