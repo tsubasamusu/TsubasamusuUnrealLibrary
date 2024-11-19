@@ -16,6 +16,11 @@ public:
 	UFUNCTION(BlueprintPure, Category = "TSUBASAMUSU|Storage")
 	static bool LocalFileExists(const FString& LocalFileName);
 
+	UFUNCTION(BlueprintCallable, Category = "TSUBASAMUSU|Storage")
+	static bool SaveFileToLocal(const FString& LocalFileName, const TArray<uint8>& FileData, bool bOverwriteIfAlreadyExists = true);
+
 private:
 	static TArray<uint8> GetLocalFileData(const FString& LocalFileName);
+
+	static FString GetLocalFilePath(const FString& LocalFileName);
 };
