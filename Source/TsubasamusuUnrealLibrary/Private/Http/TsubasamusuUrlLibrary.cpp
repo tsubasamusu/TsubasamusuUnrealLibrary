@@ -28,14 +28,14 @@ FString UTsubasamusuUrlLibrary::AddQueryParameters(const FString& SourceUrl, con
     {
         if (QueryParameter.Key.IsEmpty())
         {
-            UTsubasamusuLogLibrary::LogError(TEXT("Key of the query parameters is empty."));
+            UTsubasamusuLogLibrary::LogWarning(TEXT("Key of the query parameters is empty."));
 
             continue;
         }
 
         if (QueryParameter.Value.IsEmpty())
         {
-            UTsubasamusuLogLibrary::LogError(TEXT("Value of the query parameters is empty."));
+            UTsubasamusuLogLibrary::LogWarning(TEXT("Value of the query parameters is empty."));
 
             continue;
         }
