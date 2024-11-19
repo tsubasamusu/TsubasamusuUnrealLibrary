@@ -1,193 +1,300 @@
 #include "Convert/TsubasamusuTextureConvertLibrary.h"
 #include "Debug/TsubasamusuLogLibrary.h"
-#include "Engine/TextureRenderTarget2D.h"
 #include "IImageWrapperModule.h"
 
-UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTexture2D(UTextureRenderTarget2D* TextureRenderTarget2D)
+UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTexture(UTextureRenderTarget2D* TextureRenderTarget)
 {
-    if (!IsValid(TextureRenderTarget2D))
+    if (!IsValid(TextureRenderTarget))
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("The \"TextureRenderTarget2D\" is not valid."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed because the TextureRenderTarget2D is not valid."));
 
         return nullptr;
     }
 
-    UTexture2D* Texture2D = UTexture2D::CreateTransient(TextureRenderTarget2D->SizeX, TextureRenderTarget2D->SizeY, TextureRenderTarget2D->GetFormat());
+    UTexture2D* Texture = UTexture2D::CreateTransient(TextureRenderTarget->SizeX, TextureRenderTarget->SizeY, TextureRenderTarget->GetFormat());
 
-    if (!IsValid(Texture2D))
+    if (!IsValid(Texture))
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("Failed to create a Texture2D."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed because a Texture2D creation failed."));
 
         return nullptr;
     }
 
-    FTextureRenderTargetResource* TextureRenderTargetResource = TextureRenderTarget2D->GameThread_GetRenderTargetResource();
+    FTextureRenderTargetResource* TextureRenderTargetResource = TextureRenderTarget->GameThread_GetRenderTargetResource();
+
+    if (!TextureRenderTargetResource)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed because getting a TextureRenderTargetResource from the TextureRenderTarget2D failed."));
+
+        return nullptr;
+    }
 
     TArray<FColor> ImageColors;
 
-    TextureRenderTargetResource->ReadPixels(ImageColors);
-
-    int32 ExpectedDataSize = Texture2D->GetPlatformData()->Mips[0].BulkData.GetBulkDataSize();
-
-    if (ImageColors.Num() * sizeof(FColor) != ExpectedDataSize)
+    if (!TextureRenderTargetResource->ReadPixels(ImageColors))
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("The data size mismatch."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed because reading pixels of the TextureRenderTargetResource failed."));
 
         return nullptr;
     }
 
-    void* TextureData = Texture2D->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+    FTexturePlatformData* TexturePlatformData = Texture->GetPlatformData();
 
-    FMemory::Memcpy(TextureData, ImageColors.GetData(), ImageColors.Num() * sizeof(FColor));
-
-    Texture2D->GetPlatformData()->Mips[0].BulkData.Unlock();
-
-    Texture2D->UpdateResource();
-
-    return Texture2D;
-}
-
-TArray<uint8> UTsubasamusuTextureConvertLibrary::ConvertTextureToByteArray(UTexture2D* Texture2D)
-{
-    TArray<uint8> TextureData;
-
-    if (!IsValid(Texture2D))
+    if (!TexturePlatformData)
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("The \"Texture2D\" is not valid."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed because getting a texture platform data from the Texture2D failed."));
 
-        return TextureData;
+        return nullptr;
     }
 
-    if (!Texture2D->GetPlatformData() || Texture2D->GetPlatformData()->Mips.Num() == 0)
+    if (TexturePlatformData->Mips.Num() == 0)
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("Invalid PlatformData or no mipmaps available."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed because no mipmaps available in the Texture2D."));
 
-        return TextureData;
+        return nullptr;
     }
 
-    FTexture2DMipMap& Texture2DMipMap = Texture2D->GetPlatformData()->Mips[0];
+    FTexture2DMipMap& MipMap = TexturePlatformData->Mips[0];
 
-    void* Data = Texture2DMipMap.BulkData.Lock(LOCK_READ_ONLY);
+    int32 BulkDataSize =MipMap.BulkData.GetBulkDataSize();
+
+    if (BulkDataSize == 0)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed because the bulk data size is 0."));
+
+        return nullptr;
+    }
+
+    int32 ExpectedDataSize = ImageColors.Num() * sizeof(FColor);
+
+    if (BulkDataSize != ExpectedDataSize)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed because the bulk data size does not match the expected texture data size."));
+
+        return nullptr;
+    }
+
+    void* Data = MipMap.BulkData.Lock(LOCK_READ_WRITE);
 
     if (!Data)
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("Failed to lock the texture data."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed because locking the bulk data failed."));
 
-        return TextureData;
-    }
-
-    int32 BulkDataSize = Texture2DMipMap.BulkData.GetBulkDataSize();
-
-    if (BulkDataSize > 0)
-    {
-        TextureData.Append(static_cast<uint8*>(Data), BulkDataSize);
-    }
-    else
-    {
-        UTsubasamusuLogLibrary::LogError(TEXT("Bulk data size is zero."));
-    }
-
-    Texture2DMipMap.BulkData.Unlock();
-
-    return TextureData;
-}
-
-UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertByteArrayToTexture(const TArray<uint8>& ByteArray, int32 TextureWidth, int32 TextureHeight, EPixelFormat PixelFormat)
-{
-    UTexture2D* Texture2D = UTexture2D::CreateTransient(TextureWidth, TextureHeight, PixelFormat);
-
-    if (!IsValid(Texture2D))
-    {
-        UTsubasamusuLogLibrary::LogError(TEXT("Failed to create a Texture2D."));
+        MipMap.BulkData.Unlock();
 
         return nullptr;
     }
 
-    int32 BulkDataSize = Texture2D->GetPlatformData()->Mips[0].BulkData.GetBulkDataSize();
+    FMemory::Memcpy(Data, ImageColors.GetData(), ExpectedDataSize);
 
-    if (ByteArray.Num() != BulkDataSize)
+    MipMap.BulkData.Unlock();
+
+    Texture->UpdateResource();
+
+    if (!IsValid(Texture))
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("The \"ByteArray\" size does not match the expected texture data size."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a TextureRenderTarget2D to a Texture2D failed because the converted Texture2D is not valid."));
 
         return nullptr;
     }
 
-    void* TextureData = nullptr;
-
-    TextureData = Texture2D->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
-
-    FMemory::Memcpy(TextureData, ByteArray.GetData(), ByteArray.Num());
-
-    Texture2D->GetPlatformData()->Mips[0].BulkData.Unlock();
-
-    Texture2D->UpdateResource();
-
-    return Texture2D;
+    return Texture;
 }
 
-TArray<uint8> UTsubasamusuTextureConvertLibrary::ConvertTextureToPngData(UTexture2D* Texture2D)
+TArray<uint8> UTsubasamusuTextureConvertLibrary::ConvertTextureToImageData(UTexture2D* Texture, EImageDataFormat ImageDataFormat)
 {
-    TArray<uint8> PngData;
-
-    if (!IsValid(Texture2D))
+    if (!IsValid(Texture))
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("The \"Texture2D\" is not valid."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a image data failed because the Texture2D is not valid."));
 
-        return PngData;
+        return TArray<uint8>();
     }
 
-    if (!Texture2D->GetPlatformData() || Texture2D->GetPlatformData()->Mips.Num() == 0)
-    {
-        UTsubasamusuLogLibrary::LogError(TEXT("Invalid PlatformData or no mipmaps available."));
+    FTexturePlatformData* TexturePlatformData = Texture->GetPlatformData();
 
-        return PngData;
+    if (!TexturePlatformData)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a image data failed because getting a texture platform data from the Texture2D failed."));
+
+        return TArray<uint8>();
     }
 
-    FTexture2DMipMap& Mip = Texture2D->GetPlatformData()->Mips[0];
-
-    void* Data = Mip.BulkData.Lock(LOCK_READ_ONLY);
-
-    if (!Data)
+    if (TexturePlatformData->Mips.Num() == 0)
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("Failed to lock the texture data."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a image data failed because no mipmaps available in the Texture2D."));
 
-        return PngData;
+        return TArray<uint8>();
     }
 
-    int32 TextureWidth = Texture2D->GetSizeX();
-    int32 TextureHeight = Texture2D->GetSizeY();
+    FTexture2DMipMap& MipMap = TexturePlatformData->Mips[0];
+
+    int32 BulkDataSize = MipMap.BulkData.GetBulkDataSize();
+
+    if (BulkDataSize == 0)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a image data failed because the bulk data size is 0."));
+
+        return TArray<uint8>();
+    }
+
+    int32 TextureWidth = Texture->GetSizeX();
+    int32 TextureHeight = Texture->GetSizeY();
 
     int32 ExpectedDataSize = TextureWidth * TextureHeight * 4;
 
+    if (BulkDataSize != ExpectedDataSize)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a image data failed because the bulk data size does not match the expected image data size."));
+
+        return TArray<uint8>();
+    }
+
+    void* Data = MipMap.BulkData.Lock(LOCK_READ_ONLY);
+
+    if (!Data)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a image data failed because locking the bulk data failed."));
+
+        MipMap.BulkData.Unlock();
+
+        return TArray<uint8>();
+    }
+
     TArray<uint8> RawData;
 
-    if (Mip.BulkData.GetBulkDataSize() == ExpectedDataSize)
-    {
-        RawData.Append(static_cast<uint8*>(Data), ExpectedDataSize);
-    }
-    else
-    {
-        UTsubasamusuLogLibrary::LogError(TEXT("The texture size does not match the expected texture data size."));
-        
-        Mip.BulkData.Unlock();
-        
-        return PngData;
-    }
+    RawData.Append(static_cast<uint8*>(Data), ExpectedDataSize);
 
-    Mip.BulkData.Unlock();
+    MipMap.BulkData.Unlock();
 
     IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
-    
-    TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
 
-    if (ImageWrapper.IsValid() && ImageWrapper->SetRaw(RawData.GetData(), RawData.Num(), TextureWidth, TextureHeight, ERGBFormat::BGRA, 8))
+    TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(ConvertImageDataFormatToImageFormat(ImageDataFormat));
+
+    if (!ImageWrapper.IsValid())
     {
-        PngData = ImageWrapper->GetCompressed();
-    }
-    else
-    {
-        UTsubasamusuLogLibrary::LogError(TEXT("Failed to convert the texture to PNG data."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a image data failed because an ImageWrapper creation failed."));
+
+        return TArray<uint8>();
     }
 
-    return PngData;
+    if (!ImageWrapper->SetRaw(RawData.GetData(), RawData.Num(), TextureWidth, TextureHeight, ERGBFormat::BGRA, 8))
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a image data failed because setting raw to the ImageWrapper failed."));
+
+        return TArray<uint8>();
+    }
+
+    TArray<uint8> ImageData;
+
+    ImageData = ImageWrapper->GetCompressed();
+
+    if (ImageData.Num() == 0)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a image data failed because the converted image data size is 0."));
+
+        return TArray<uint8>();
+    }
+
+    return ImageData;
+}
+
+UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertImageDataToTexture(const TArray<uint8>& ImageData, EImageDataFormat ImageDataFormat)
+{
+    if (ImageData.Num() == 0)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a image data to a Texture2D failed because the image data size is 0."));
+
+        return nullptr;
+    }
+
+    IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
+
+    TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(ConvertImageDataFormatToImageFormat(ImageDataFormat));
+
+    if (!ImageWrapper.IsValid())
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a image data to a Texture2D failed because an ImageWrapper creation failed."));
+
+        return nullptr;
+    }
+
+    if (!ImageWrapper->SetCompressed(ImageData.GetData(), ImageData.Num()))
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a image data to a Texture2D failed because setting a compressed image data to the ImageWrapper failed."));
+
+        return nullptr;
+    }
+
+    TArray<uint8> RawData;
+
+    if (!ImageWrapper->GetRaw(ERGBFormat::BGRA, 8, RawData))
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a Texture2D to a image data failed because getting raw from the ImageWrapper failed."));
+
+        return nullptr;
+    }
+
+    int32 TextureWidth = ImageWrapper->GetWidth();
+    int32 TextureHeight = ImageWrapper->GetHeight();
+
+    UTexture2D* Texture = UTexture2D::CreateTransient(TextureWidth, TextureHeight, PF_B8G8R8A8);
+
+    if (!IsValid(Texture))
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a image data to a Texture2D failed because a Texture2D creation failed."));
+
+        return nullptr;
+    }
+
+    Texture->CompressionSettings = TC_VectorDisplacementmap;
+    Texture->SRGB = true;
+
+    FTexturePlatformData* TexturePlatformData = Texture->GetPlatformData();
+
+    if (!TexturePlatformData)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a image data to a Texture2D failed because getting a texture platform data from the Texture2D failed."));
+
+        return nullptr;
+    }
+
+    if (TexturePlatformData->Mips.Num() == 0)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a image data to a Texture2D failed because no mipmaps available in the Texture2D."));
+
+        return nullptr;
+    }
+
+    FTexture2DMipMap& MipMap = TexturePlatformData->Mips[0];
+
+    void* Data = MipMap.BulkData.Lock(LOCK_READ_WRITE);
+
+    if (!Data)
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a image data to a Texture2D failed because locking the bulk data failed."));
+
+        MipMap.BulkData.Unlock();
+
+        return nullptr;
+    }
+
+    FMemory::Memcpy(Data, RawData.GetData(), RawData.Num());
+
+    MipMap.BulkData.Unlock();
+
+    Texture->UpdateResource();
+
+    if (!IsValid(Texture))
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Converting a image data to a Texture2D failed because the converted Texture2D is not valid."));
+
+        return nullptr;
+    }
+
+    return Texture;
+}
+
+EImageFormat UTsubasamusuTextureConvertLibrary::ConvertImageDataFormatToImageFormat(EImageDataFormat ImageDataFormat)
+{
+    return static_cast<EImageFormat>(static_cast<int32>(ImageDataFormat));
 }

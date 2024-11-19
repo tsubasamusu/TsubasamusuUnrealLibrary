@@ -6,18 +6,18 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Debug/TsubasamusuLogLibrary.h"
 
-UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldContextObject, UCameraComponent* CameraComponent, const FPostProcessSettings& PostProcessSettings, int32 TextureWidth, int32 TextureHeight, ETextureRenderTargetFormat TextureRenderTargetFormat, ESceneCaptureSource SceneCaptureSource)
+UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldContextObject, UCameraComponent* TargetCameraComponent, int32 TextureWidth, int32 TextureHeight, FPostProcessSettings PostProcessSettings, ETextureRenderTargetFormat TextureRenderTargetFormat, ESceneCaptureSource SceneCaptureSource)
 {
     if (!IsValid(WorldContextObject))
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("The \"WorldContextObject\" is not valid."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Getting a camera view texture failed because the world context object is not valid."));
 
         return nullptr;
     }
 
-    if (!IsValid(CameraComponent))
+    if (!IsValid(TargetCameraComponent))
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("The \"CameraComponent\" is not valid."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Getting a camera view texture failed because the camera component is not valid."));
 
         return nullptr;
     }
@@ -26,7 +26,7 @@ UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldConte
 
     if (!IsValid(TextureRenderTarget2D))
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("Failed to create a TextureRenderTarget2D."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Getting a camera view texture failed because a TextureRenderTarget2D creation failed."));
 
         return nullptr;
     }
@@ -35,13 +35,13 @@ UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldConte
 
     if (!IsValid(SceneCaptureActor))
     {
-        UTsubasamusuLogLibrary::LogError(TEXT("Failed to spawn a SceneCapture2D Actor."));
+        UTsubasamusuLogLibrary::LogError(TEXT("Getting a camera view texture failed because a SceneCapture2D actor failed to spawn."));
 
         return nullptr;
     }
 
-    SceneCaptureActor->SetActorLocation(CameraComponent->GetComponentLocation());
-    SceneCaptureActor->SetActorRotation(CameraComponent->GetComponentRotation());
+    SceneCaptureActor->SetActorLocation(TargetCameraComponent->GetComponentLocation());
+    SceneCaptureActor->SetActorRotation(TargetCameraComponent->GetComponentRotation());
 
     USceneCaptureComponent2D* SceneCaptureComponent2D = SceneCaptureActor->GetCaptureComponent2D();
 
@@ -50,15 +50,25 @@ UTexture2D* UTsubasamusuCaptureLibrary::GetCameraViewTexture(UObject* WorldConte
     SceneCaptureComponent2D->bCaptureOnMovement = false;
     SceneCaptureComponent2D->bAlwaysPersistRenderingState = true;
     SceneCaptureComponent2D->TextureTarget = TextureRenderTarget2D;
-    SceneCaptureComponent2D->FOVAngle = CameraComponent->FieldOfView;
-
+    SceneCaptureComponent2D->FOVAngle = TargetCameraComponent->FieldOfView;
     SceneCaptureComponent2D->PostProcessSettings = PostProcessSettings;
-
     SceneCaptureComponent2D->CaptureScene();
 
-    UTexture2D* Texture2D = UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTexture2D(SceneCaptureComponent2D->TextureTarget);
+    UTexture2D* Texture = UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTexture(SceneCaptureComponent2D->TextureTarget);
 
-    SceneCaptureActor->Destroy();
+    if (!SceneCaptureActor->Destroy())
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Getting a camera view texture failed because the SceneCapture2D actor failed to destroy."));
 
-    return Texture2D;
+        return nullptr;
+    }
+
+    if (!IsValid(Texture))
+    {
+        UTsubasamusuLogLibrary::LogError(TEXT("Getting a camera view texture failed because the TextureRenderTarget2D conversion failed."));
+
+        return nullptr;
+    }
+
+    return Texture;
 }

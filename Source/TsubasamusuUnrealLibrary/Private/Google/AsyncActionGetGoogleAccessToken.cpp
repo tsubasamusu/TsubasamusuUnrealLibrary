@@ -60,6 +60,8 @@ void UAsyncActionGetGoogleAccessToken::Activate()
 
 			if (!FJsonSerializer::Deserialize(JsonReader, JsonObject) || !JsonObject.IsValid())
 			{
+				UTsubasamusuLogLibrary::LogError(TEXT("The JSON response is \"") + JsonResponse + TEXT("\"."));
+
 				OnFailed(TEXT("deserialize the JSON response"));
 
 				return;
@@ -81,7 +83,7 @@ void UAsyncActionGetGoogleAccessToken::Activate()
 				UTsubasamusuLogLibrary::LogError(TEXT("The error is \"") + ErrorMessage + TEXT("\"."));
 				UTsubasamusuLogLibrary::LogError(TEXT("The error description is \"") + ErrorDescription + TEXT("\"."));
 
-				OnFailed(TEXT("get access token field from the JSON response"));
+				OnFailed(TEXT("get an access token field from the JSON response"));
 
 				return;
 			}
@@ -209,7 +211,7 @@ FString UAsyncActionGetGoogleAccessToken::GetGoogleCloudJsonContent()
 
 void UAsyncActionGetGoogleAccessToken::OnSucceeded(const FString& AccessToken)
 {
-	Completed.Broadcast(AccessToken, ExpirationUnixTime, true);
+	Succeeded.Broadcast(AccessToken, ExpirationUnixTime);
 
 	SetReadyToDestroy();
 }
@@ -218,7 +220,7 @@ void UAsyncActionGetGoogleAccessToken::OnFailed(const FString& TriedThing)
 {
 	UTsubasamusuLogLibrary::LogError(TEXT("Failed to ") + TriedThing + TEXT(" to get an access token for Google Cloud."));
 
-	Completed.Broadcast(TEXT(""), -1, false);
+	Failed.Broadcast();
 
 	SetReadyToDestroy();
 }
