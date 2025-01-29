@@ -1,4 +1,9 @@
 #include "Slack/AsyncActionSendFileToSlack.h"
+#include "Interfaces/IHttpRequest.h"
+#include "Interfaces/IHttpResponse.h"
+#include "HttpModule.h"
+#include "Http/TsubasamusuUrlLibrary.h"
+#include "Debug/TsubasamusuLogLibrary.h"
 
 UAsyncActionSendFileToSlack* UAsyncActionSendFileToSlack::AsyncSendFileToSlack(UObject* WorldContextObject, const FString& Token, const FString& FileName, const FString& ChannelId, const FString& Message, const TArray<uint8>& FileData)
 {

@@ -1,4 +1,5 @@
 #include "Storage/TsubasamusuLocalFileLibrary.h"
+#include "Debug/TsubasamusuLogLibrary.h"
 
 TArray<uint8> UTsubasamusuLocalFileLibrary::LoadLocalFile(const FString& LocalFileName)
 {
