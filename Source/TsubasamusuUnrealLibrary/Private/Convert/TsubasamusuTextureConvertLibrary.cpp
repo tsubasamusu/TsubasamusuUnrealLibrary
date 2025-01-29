@@ -1,6 +1,7 @@
 #include "Convert/TsubasamusuTextureConvertLibrary.h"
 #include "Debug/TsubasamusuLogLibrary.h"
 #include "IImageWrapperModule.h"
+#include "Engine/TextureRenderTarget2D.h"
 
 UTexture2D* UTsubasamusuTextureConvertLibrary::ConvertTextureRenderTargetToTexture(UTextureRenderTarget2D* TextureRenderTarget)
 {

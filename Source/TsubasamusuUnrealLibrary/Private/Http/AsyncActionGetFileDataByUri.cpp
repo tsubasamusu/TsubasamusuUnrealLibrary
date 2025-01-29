@@ -1,4 +1,8 @@
 #include "Http/AsyncActionGetFileDataByUri.h"
+#include "Interfaces/IHttpRequest.h"
+#include "Interfaces/IHttpResponse.h"
+#include "HttpModule.h"
+#include "Debug/TsubasamusuLogLibrary.h"
 
 UAsyncActionGetFileDataByUri* UAsyncActionGetFileDataByUri::AsyncGetFileDataByUri(UObject* WorldContextObject, const FString& Uri)
 {

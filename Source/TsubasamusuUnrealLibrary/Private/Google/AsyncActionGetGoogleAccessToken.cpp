@@ -2,6 +2,8 @@
 #include "Interfaces/IHttpRequest.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
+#include "Debug/TsubasamusuLogLibrary.h"
+#include "Convert/TsubasamusuStringConvertLibrary.h"
 
 #define UI UI_ST
 THIRD_PARTY_INCLUDES_START
